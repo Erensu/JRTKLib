@@ -30,6 +30,11 @@
  *           2016/01/26 1.11 rtklib ver.2.4.3
  *-----------------------------------------------------------------------------*/
 
+import java.lang.String;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
 public class rtklib {
     /* constants -----------------------------------------------------------------*/
     final String VER_RTKLIB = "2.4.3";             /* library version */
@@ -391,8 +396,8 @@ public class rtklib {
     final int GEOID_GSI2000_M15 = 4;             /* geoid model: GSI geoid 2000 1.0x1.5" */
     final int GEOID_RAF09       = 5;             /* geoid model: IGN RAF09 for France 1.5"x2" */
 
-    String COMMENTH    = "%";                 /* comment line indicator for solution */
-    String MSG_DISCONN = "$_DISCONNECT\r\n";  /* disconnect message */
+    final String COMMENTH    = "%";                 /* comment line indicator for solution */
+    final String MSG_DISCONN = "$_DISCONNECT\r\n";  /* disconnect message */
 
     final int DLOPT_FORCE   = 0x01;              /* download option: force download existing */
     final int DLOPT_KEEPCMP = 0x02;              /* download option: keep compressed file */
@@ -435,7 +440,7 @@ public class rtklib {
     /* type definitions ----------------------------------------------------------*/
 
     public class gtime_t {        /* time struct */
-        time_t time;        /* time (s) expressed by standard time_t */
+        Instant time;        /* time (s) expressed by standard time_t */
         double sec;         /* fraction of second under 1 s */
     };
 
@@ -751,13 +756,13 @@ public class rtklib {
     public class pppcorr_t {        /* ppp corrections type */
         int nsta;           /* number of stations */
         char[][] stas = new char[MAXSTA][8]; /* station names */
-        double[][] rr[MAXSTA][3]; /* station ecef positions (m) */
-        int ns[MAXSTA];
-        int nsmax[MAXSTA]; /* number of stec data */
-        int nt[MAXSTA];
-        int ntmax[MAXSTA]; /* number of trop data */
-        stec_t *stec[MAXSTA]; /* stec data */
-        trop_t *trop[MAXSTA]; /* trop data */
+        double[][] rr = new double[MAXSTA][3]; /* station ecef positions (m) */
+        int[] ns = new int[MAXSTA];
+        int[] nsmax = new int[MAXSTA]; /* number of stec data */
+        int[] nt = new int[MAXSTA];
+        int[] ntmax = new int[MAXSTA]; /* number of trop data */
+        List<stec_t[]> stec = new ArrayList<stec_t[]>(); /* stec data with size [MAXSTA] */
+        List<trop_t[]> trop = new ArrayList<trop_t[]>(); /* trop data with size [MAXSTA] */
     } ;
 
     public class nav_t {        /* navigation data type */
@@ -769,14 +774,14 @@ public class rtklib {
         int na,namax;       /* number of almanac data */
         int nt,ntmax;       /* number of tec grid data */
         int nf,nfmax;       /* number of satellite fcb data */
-        eph_t eph;         /* GPS/QZS/GAL ephemeris */
-        geph_t geph;       /* GLONASS ephemeris */
-        seph_t seph;       /* SBAS ephemeris */
-        peph_t *peph;       /* precise ephemeris */
-        pclk_t *pclk;       /* precise clock */
-        alm_t *alm;         /* almanac data */
-        tec_t *tec;         /* tec grid data */
-        fcbd_t *fcb;        /* satellite fcb data */
+        List<eph_t> eph = new ArrayList<eph_t>();         /* GPS/QZS/GAL ephemeris */
+        List<geph_t> geph = new ArrayList<geph_t>();      /* GLONASS ephemeris */
+        List<seph_t> seph;       /* SBAS ephemeris */
+        List<peph_t> peph;       /* precise ephemeris */
+        List<pclk_t> pclk;       /* precise clock */
+        List<alm_t> alm;         /* almanac data */
+        List<tec_t> tec;         /* tec grid data */
+        List<fcbd_t> fcb;        /* satellite fcb data */
         erp_t  erp;         /* earth rotation parameters */
         double[] utc_gps = new double[4];  /* GPS delta-UTC parameters {A0,A1,T,W} */
         double[] utc_glo = new double[4];  /* GLONASS UTC GPS time parameters */
@@ -799,39 +804,39 @@ public class rtklib {
         char[] glo_fcn = new char[MAXPRNGLO+1]; /* glonass frequency channel number + 8 */
         pcv_t[] pcvs = new pcv_t[MAXSAT]; /* satellite antenna pcv */
         sbssat_t sbssat;    /* SBAS satellite corrections */
-        sbsion_t sbsion[MAXBAND+1]; /* SBAS ionosphere corrections */
-        dgps_t dgps[MAXSAT]; /* DGPS corrections */
-        ssr_t ssr[MAXSAT];  /* SSR corrections */
-        lexeph_t lexeph[MAXSAT]; /* LEX ephemeris */
+        sbsion_t[] sbsion = new sbsion_t[MAXBAND+1]; /* SBAS ionosphere corrections */
+        dgps_t[] dgps = new dgps_t[MAXSAT]; /* DGPS corrections */
+        ssr_t[] ssr = new ssr_t[MAXSAT];  /* SSR corrections */
+        lexeph_t[] lexeph = new lexeph_t[MAXSAT]; /* LEX ephemeris */
         lexion_t lexion;    /* LEX ionosphere correction */
         pppcorr_t pppcorr;  /* ppp corrections */
     } ;
 
     public class sta_t {        /* station parameter type */
-        char name   [MAXANT]; /* marker name */
-        char marker [MAXANT]; /* marker number */
-        char antdes [MAXANT]; /* antenna descriptor */
-        char antsno [MAXANT]; /* antenna serial number */
-        char rectype[MAXANT]; /* receiver type descriptor */
-        char recver [MAXANT]; /* receiver firmware version */
-        char recsno [MAXANT]; /* receiver serial number */
+        char[] name   = new char[MAXANT]; /* marker name */
+        char[] marker = new char[MAXANT]; /* marker number */
+        char[] antdes = new char[MAXANT]; /* antenna descriptor */
+        char[] antsno = new char[MAXANT]; /* antenna serial number */
+        char[] rectype= new char[MAXANT]; /* receiver type descriptor */
+        char[] recver = new char[MAXANT]; /* receiver firmware version */
+        char[] recsno = new char[MAXANT]; /* receiver serial number */
         int antsetup;       /* antenna setup id */
         int itrf;           /* ITRF realization year */
         int deltype;        /* antenna delta type (0:enu,1:xyz) */
-        double pos[3];      /* station position (ecef) (m) */
-        double del[3];      /* antenna position delta (e/n/u or x/y/z) (m) */
+        double[] pos = new double[3];      /* station position (ecef) (m) */
+        double[] del = new double[3];      /* antenna position delta (e/n/u or x/y/z) (m) */
         double hgt;         /* antenna height (m) */
     } ;
 
     public class sol_t {        /* solution type */
         gtime_t time;       /* time (GPST) */
-        double rr[6];       /* position/velocity (m|m/s) */
+        double[] rr = new double[6];       /* position/velocity (m|m/s) */
         /* {x,y,z,vx,vy,vz} or {e,n,u,ve,vn,vu} */
-        float  qr[6];       /* position variance/covariance (m^2) */
+        float[]  qr = new float[6];       /* position variance/covariance (m^2) */
         /* {c_xx,c_yy,c_zz,c_xy,c_yz,c_zx} or */
         /* {c_ee,c_nn,c_uu,c_en,c_nu,c_ue} */
-        float  qv[6];       /* velocity variance/covariance (m^2/s^2) */
-        double dtr[6];      /* receiver clock bias to time systems (s) */
+        float[]  qv = new float[6];       /* velocity variance/covariance (m^2/s^2) */
+        double[] dtr = new double[6];      /* receiver clock bias to time systems (s) */
         byte type; /* type (0:xyz-ecef,1:enu-baseline) */
         byte stat; /* solution status (SOLQ_???) */
         byte ns;   /* number of valid satellites */
@@ -845,9 +850,9 @@ public class rtklib {
         int cyclic;         /* cyclic buffer flag */
         int start,end;      /* start/end index */
         gtime_t time;       /* current solution time */
-        sol_t *data;        /* solution data */
-        double rb[3];       /* reference position {x,y,z} (ecef) (m) */
-        byte buff[MAXSOLMSG+1]; /* message buffer */
+        List<sol_t> data = new ArrayList<sol_t>();        /* solution data */
+        double[] rb= new double[3];       /* reference position {x,y,z} (ecef) (m) */
+        byte[] buff = new byte[MAXSOLMSG+1]; /* message buffer */
         int nb;             /* number of byte in message buffer */
     } ;
 
@@ -881,25 +886,25 @@ public class rtklib {
         obs_t obs;          /* observation data (uncorrected) */
         nav_t nav;          /* satellite ephemerides */
         sta_t sta;          /* station parameters */
-        dgps_t *dgps;       /* output of dgps corrections */
-        ssr_t ssr[MAXSAT];  /* output of ssr corrections */
-        char msg[128];      /* special message */
-        char msgtype[256];  /* last message type */
-        char msmtype[6][128]; /* msm signal types */
+        List<dgps_t> dgps = new ArrayList<>();       /* output of dgps corrections */
+        ssr_t[] ssr = new ssr_t[MAXSAT];  /* output of ssr corrections */
+        char[] msg = new char[128];      /* special message */
+        char[] msgtype = new char[256];  /* last message type */
+        char[][] msmtype = new char[6][128]; /* msm signal types */
         int obsflag;        /* obs data complete flag (1:ok,0:not complete) */
         int ephsat;         /* update satellite of ephemeris */
-        double cp[MAXSAT][NFREQ+NEXOBS]; /* carrier-phase measurement */
-        int lock[MAXSAT][NFREQ+NEXOBS]; /* lock time */
-        int loss[MAXSAT][NFREQ+NEXOBS]; /* loss of lock count */
-        gtime_t lltime[MAXSAT][NFREQ+NEXOBS]; /* last lock time */
+        double[][] cp = new double[MAXSAT][NFREQ+NEXOBS]; /* carrier-phase measurement */
+        int[][] lock = new int[MAXSAT][NFREQ+NEXOBS]; /* lock time */
+        int[][] loss = new int[MAXSAT][NFREQ+NEXOBS]; /* loss of lock count */
+        gtime_t[][] lltime = new gtime_t[MAXSAT][NFREQ+NEXOBS]; /* last lock time */
         int nbyte;          /* number of bytes in message buffer */
         int nbit;           /* number of bits in word buffer */
         int len;            /* message length (bytes) */
-        byte buff[1200]; /* message buffer */
+        byte[] buff = new byte[1200]; /* message buffer */
         long word;  /* word buffer for rtcm 2 */
-        long nmsg2[100]; /* message count of RTCM 2 (1-99:1-99,0:other) */
-        long nmsg3[400]; /* message count of RTCM 3 (1-299:1001-1299,300-399:2000-2099,0:ohter) */
-        char opt[256];      /* RTCM dependent options */
+        long[] nmsg2 = new long[100]; /* message count of RTCM 2 (1-99:1-99,0:other) */
+        long[] nmsg3 = new long[400]; /* message count of RTCM 3 (1-299:1001-1299,300-399:2000-2099,0:ohter) */
+        char[] opt = new char[256];      /* RTCM dependent options */
     } ;
 
     public class rnxctr_t {        /* rinex control struct type */
@@ -908,39 +913,40 @@ public class rtklib {
         char   type;        /* rinex file type ('O','N',...) */
         int    sys;         /* navigation system */
         int    tsys;        /* time system */
-        char   tobs[7][MAXOBSTYPE][4]; /* rinex obs types */
+        char[][][]   tobs = new char[7][MAXOBSTYPE][4]; /* rinex obs types */
         obs_t  obs;         /* observation data */
         nav_t  nav;         /* navigation data */
         sta_t  sta;         /* station info */
         int    ephsat;      /* ephemeris satellite number */
-        char   opt[256];    /* rinex dependent options */
+        char[]   opt = new char[256];    /* rinex dependent options */
     } ;
 
     public class url_t {        /* download url type */
-        char type[32];      /* data type */
-        char path[1024];    /* url path */
-        char dir [1024];    /* local directory */
+        char[] type = new char[32];      /* data type */
+        char[] path = new char[1024];    /* url path */
+        char[] dir = new char[1024];    /* local directory */
         double tint;        /* time interval (s) */
     } ;
 
     public class opt_t {        /* option type */
-const char *name;   /* option name */
+        final String name = new String();   /* option name */
         int format;         /* option format (0:int,1:double,2:string,3:enum) */
-        void *var;          /* pointer to option variable */
-const char *comment; /* option comment/enum labels/unit */
+        // todo: Need to find the type
+        // void *var;          /* pointer to option variable */
+        final String comment = new String(); /* option comment/enum labels/unit */
     } ;
 
     public class exterr_t {        /* extended receiver error model */
-        int ena[4];         /* model enabled */
-        double cerr[4][NFREQ*2]; /* code errors (m) */
-        double perr[4][NFREQ*2]; /* carrier-phase errors (m) */
-        double gpsglob[NFREQ]; /* gps-glonass h/w bias (m) */
-        double gloicb [NFREQ]; /* glonass interchannel bias (m/fn) */
+        int[] ena = new int[4];         /* model enabled */
+        double[][] cerr = new double[4][NFREQ*2]; /* code errors (m) */
+        double[][] perr = new double[4][NFREQ*2]; /* carrier-phase errors (m) */
+        double[] gpsglob = new double[NFREQ]; /* gps-glonass h/w bias (m) */
+        double[] gloicb = new double [NFREQ]; /* glonass interchannel bias (m/fn) */
     } ;
 
     public class snrmask_t {        /* SNR mask type */
-        int ena[2];         /* enable flag {rover,base} */
-        double mask[NFREQ][9]; /* mask (dBHz) at 5,10,...85 deg */
+        int[] ena = new int[2];         /* enable flag {rover,base} */
+        double[][] mask = new double[NFREQ][9]; /* mask (dBHz) at 5,10,...85 deg */
     } ;
 
     public class prcopt_t {        /* processing options type */
@@ -971,38 +977,38 @@ const char *comment; /* option comment/enum labels/unit */
         int refpos;         /* base position for relative mode */
         /* (0:pos in prcopt,  1:average of single pos, */
         /*  2:read from file, 3:rinex header, 4:rtcm pos) */
-        double eratio[NFREQ]; /* code/phase error ratio */
-        double err[5];      /* measurement error factor */
+        double[] eratio = new double[NFREQ]; /* code/phase error ratio */
+        double[] err = new double[5];      /* measurement error factor */
         /* [0]:reserved */
         /* [1-3]:error factor a/b/c of phase (m) */
         /* [4]:doppler frequency (hz) */
-        double std[3];      /* initial-state std [0]bias,[1]iono [2]trop */
-        double prn[6];      /* process-noise std [0]bias,[1]iono [2]trop [3]acch [4]accv [5] pos */
+        double[] std = new double[3];      /* initial-state std [0]bias,[1]iono [2]trop */
+        double[] prn = new double[6];      /* process-noise std [0]bias,[1]iono [2]trop [3]acch [4]accv [5] pos */
         double sclkstab;    /* satellite clock stability (sec/sec) */
-        double thresar[8];  /* AR validation threshold */
+        double[] thresar = new double[8];  /* AR validation threshold */
         double elmaskar;    /* elevation mask of AR for rising satellite (deg) */
         double elmaskhold;  /* elevation mask to hold ambiguity (deg) */
         double thresslip;   /* slip threshold of geometry-free phase (m) */
         double maxtdiff;    /* max difference of time (sec) */
         double maxinno;     /* reject threshold of innovation (m) */
         double maxgdop;     /* reject threshold of gdop */
-        double baseline[2]; /* baseline length constraint {const,sigma} (m) */
-        double ru[3];       /* rover position for fixed mode {x,y,z} (ecef) (m) */
-        double rb[3];       /* base position for relative mode {x,y,z} (ecef) (m) */
-        char anttype[2][MAXANT]; /* antenna types {rover,base} */
-        double antdel[2][3]; /* antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
-        pcv_t pcvr[2];      /* receiver antenna parameters {rov,base} */
-        byte exsats[MAXSAT]; /* excluded satellites (1:excluded,2:included) */
+        double[] baseline = new double[2]; /* baseline length constraint {const,sigma} (m) */
+        double[] ru = new double[3];       /* rover position for fixed mode {x,y,z} (ecef) (m) */
+        double[] rb = new double[3];       /* base position for relative mode {x,y,z} (ecef) (m) */
+        char[][] anttype = new char[2][MAXANT]; /* antenna types {rover,base} */
+        double[][] antdel = new double[2][3]; /* antenna delta {{rov_e,rov_n,rov_u},{ref_e,ref_n,ref_u}} */
+        pcv_t[] pcvr = new pcv_t[2];      /* receiver antenna parameters {rov,base} */
+        byte[] exsats = new byte[MAXSAT]; /* excluded satellites (1:excluded,2:included) */
         int  maxaveep;      /* max averaging epoches */
         int  initrst;       /* initialize by restart */
         int  outsingle;     /* output single by dgps/float/fix/ppp outage */
-        char rnxopt[2][256]; /* rinex options {rover,base} */
-        int  posopt[6];     /* positioning options */
+        char[][] rnxopt = new char[2][256]; /* rinex options {rover,base} */
+        int[]  posopt = new int[6];     /* positioning options */
         int  syncsol;       /* solution sync mode (0:off,1:on) */
-        double odisp[2][6*11]; /* ocean tide loading parameters {rov,base} */
+        double[][] odisp = new double[2][6*11]; /* ocean tide loading parameters {rov,base} */
         exterr_t exterr;    /* extended receiver error model */
         int freqopt;        /* disable L2-AR */
-        char pppopt[256];   /* ppp option */
+        char[] pppopt = new char[256];   /* ppp option */
     } ;
 
     public class solopt_t {        /* solution options type */
@@ -1020,10 +1026,10 @@ const char *comment; /* option comment/enum labels/unit */
         int solstatic;      /* solution of static mode (0:all,1:single) */
         int sstat;          /* solution statistics level (0:off,1:states,2:residuals) */
         int trace;          /* debug trace level (0:off,1-5:debug) */
-        double nmeaintv = new double[2]; /* nmea output interval (s) (<0:no,0:all) */
+        double[] nmeaintv = new double[2]; /* nmea output interval (s) (<0:no,0:all) */
         /* nmeaintv[0]:gprmc,gpgga,nmeaintv[1]:gpgsv */
         char[] sep = new char[64];       /* field separator */
-        cha[r prog = new char[64];      /* program name */
+        char[] prog = new char[64];      /* program name */
         double maxsolstd;   /* max std-dev for solution output (m) (0:all) */
     } ;
 
@@ -1076,54 +1082,56 @@ const char *comment; /* option comment/enum labels/unit */
         gtime_t tstart;     /* first obs time */
         gtime_t tend;       /* last obs time */
         gtime_t trtcm;      /* approx log start time for rtcm */
-        char tobs[7][MAXOBSTYPE][4]; /* obs types {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
-        int nobs[7];        /* number of obs types {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
+        char[][][] tobs = new char[7][MAXOBSTYPE][4]; /* obs types {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
+        int[] nobs = new int[7];        /* number of obs types {GPS,GLO,GAL,QZS,SBS,CMP,IRN} */
     } ;
 
     public class ssat_t {        /* satellite status type */
         byte sys;  /* navigation system */
         byte vs;   /* valid satellite flag single */
-        double azel[2];     /* azimuth/elevation angles {az,el} (rad) */
-        double resp[NFREQ]; /* residuals of pseudorange (m) */
-        double resc[NFREQ]; /* residuals of carrier-phase (m) */
-        byte vsat[NFREQ]; /* valid satellite flag */
-        byte snr [NFREQ]; /* signal strength (0.25 dBHz) */
-        byte fix [NFREQ]; /* ambiguity fix flag (1:fix,2:float,3:hold) */
-        byte slip[NFREQ]; /* cycle-slip flag */
-        byte half[NFREQ]; /* half-cycle valid flag */
-        int lock [NFREQ];   /* lock counter of phase */
-        long outc [NFREQ]; /* obs outage counter of phase */
-        long slipc[NFREQ]; /* cycle-slip counter */
-        long rejc [NFREQ]; /* reject counter */
+        double[] azel = new double[2];     /* azimuth/elevation angles {az,el} (rad) */
+        double[] resp = new double[NFREQ]; /* residuals of pseudorange (m) */
+        double[] resc = new double[NFREQ]; /* residuals of carrier-phase (m) */
+        byte[] vsat = new byte[NFREQ]; /* valid satellite flag */
+        byte[] snr = new byte[NFREQ]; /* signal strength (0.25 dBHz) */
+        byte[] fix = new byte[NFREQ]; /* ambiguity fix flag (1:fix,2:float,3:hold) */
+        byte[] slip = new byte[NFREQ]; /* cycle-slip flag */
+        byte[] half = new byte[NFREQ]; /* half-cycle valid flag */
+        int[] lock = new int[NFREQ];   /* lock counter of phase */
+        long[] outc = new long[NFREQ]; /* obs outage counter of phase */
+        long[] slipc = new long[NFREQ]; /* cycle-slip counter */
+        long[] rejc = new long[NFREQ]; /* reject counter */
         double  gf;         /* geometry-free phase L1-L2 (m) */
         double  gf2;        /* geometry-free phase L1-L5 (m) */
         double  mw;         /* MW-LC (m) */
         double  phw;        /* phase windup (cycle) */
-        gtime_t pt[2][NFREQ]; /* previous carrier-phase time */
-        double  ph[2][NFREQ]; /* previous carrier-phase observable (cycle) */
+        gtime_t[][] pt = new gtime_t[2][NFREQ]; /* previous carrier-phase time */
+        double[][]  ph = new double[2][NFREQ]; /* previous carrier-phase observable (cycle) */
     } ;
 
     public class ambc_t {        /* ambiguity control type */
-        gtime_t epoch[4];   /* last epoch */
-        int n[4];           /* number of epochs */
-        double LC [4];      /* linear combination average */
-        double LCv[4];      /* linear combination variance */
+        gtime_t[] epoch = new gtime_t[4];   /* last epoch */
+        int[] n = new int[4];           /* number of epochs */
+        double[] LC = new double[4];      /* linear combination average */
+        double[] LCv = new double[4];      /* linear combination variance */
         int fixcnt;         /* fix count */
-        char flags[MAXSAT]; /* fix flags */
+        char[] flags = new char[MAXSAT]; /* fix flags */
     } ;
 
     public class rtk_t {        /* RTK control/result type */
         sol_t  sol;         /* RTK solution */
-        double rb[6];       /* base position/velocity (ecef) (m|m/s) */
+        double[] rb = new double[6];       /* base position/velocity (ecef) (m|m/s) */
         int nx,na;          /* number of float states/fixed states */
         double tt;          /* time difference between current and previous (s) */
-        double *x, *P;      /* float states and their covariance */
-        double *xa,*Pa;     /* fixed states and their covariance */
+        List<Double> x = new ArrayList<Double>();
+        List<Double> P = new ArrayList<Double>();      /* float states and their covariance */
+        List<Double> xa = new ArrayList<Double>();
+        List<Double> Pa = new ArrayList<Double>();     /* fixed states and their covariance */
         int nfix;           /* number of continuous fixes of ambiguity */
-        ambc_t ambc[MAXSAT]; /* ambibuity control */
-        ssat_t ssat[MAXSAT]; /* satellite status */
+        ambc_t[] ambc = new ambc_t[MAXSAT]; /* ambibuity control */
+        ssat_t[] ssat = new ssat_t[MAXSAT]; /* satellite status */
         int neb;            /* bytes in error message buffer */
-        char errbuf[MAXERRMSG]; /* error message buffer */
+        char[] errbuf = new char[MAXERRMSG]; /* error message buffer */
         prcopt_t opt;       /* processing options */
     } ;
 
@@ -1133,26 +1141,27 @@ const char *comment; /* option comment/enum labels/unit */
         byte valid; /* half-cycle valid flag */
         char corr;          /* half-cycle corrected (x 0.5 cyc) */
         gtime_t ts,te;      /* time start, time end */
-        struct half_cyc_tag *next; /* pointer to next correction */
+        // todo: I think this was double linked list
+        half_cyc_t next; /* pointer to next correction */
     } ;
 
     public class raw_t {        /* receiver raw data control type */
         gtime_t time;       /* message time */
-        gtime_t tobs[MAXSAT][NFREQ+NEXOBS]; /* observation data time */
+        gtime_t[][] tobs = new gtime_t[MAXSAT][NFREQ+NEXOBS]; /* observation data time */
         obs_t obs;          /* observation data */
         obs_t obuf;         /* observation data buffer */
         nav_t nav;          /* satellite ephemerides */
         sta_t sta;          /* station parameters */
         int ephsat;         /* sat number of update ephemeris (0:no satellite) */
         sbsmsg_t sbsmsg;    /* SBAS message */
-        char msgtype[256];  /* last message type */
-        byte subfrm[MAXSAT][380];  /* subframe buffer */
+        char[] msgtype = new char[256];  /* last message type */
+        byte[][] subfrm = new byte[MAXSAT][380];  /* subframe buffer */
         lexmsg_t lexmsg;    /* LEX message */
-        double lockt[MAXSAT][NFREQ+NEXOBS]; /* lock time (s) */
-        double icpp[MAXSAT],off[MAXSAT],icpc; /* carrier params for ss2 */
-        double prCA[MAXSAT],dpCA[MAXSAT]; /* L1/CA pseudrange/doppler for javad */
-        byte halfc[MAXSAT][NFREQ+NEXOBS]; /* half-cycle add flag */
-        char freqn[MAXOBS]; /* frequency number for javad */
+        double[][] lockt = new double[MAXSAT][NFREQ+NEXOBS]; /* lock time (s) */
+        double[] icpp = new double[MAXSAT],off = new double[MAXSAT],icpc; /* carrier params for ss2 */
+        double[] prCA = new double[MAXSAT],dpCA = new double[MAXSAT]; /* L1/CA pseudrange/doppler for javad */
+        byte[][] halfc = new byte[MAXSAT][NFREQ+NEXOBS]; /* half-cycle add flag */
+        char[] freqn = new char[MAXOBS]; /* frequency number for javad */
         int nbyte;          /* number of bytes in message buffer */
         int len;            /* message length (bytes) */
         int iod;            /* issue of data */
@@ -1160,12 +1169,13 @@ const char *comment; /* option comment/enum labels/unit */
         int tbase;          /* time base (0:gpst,1:utc(usno),2:glonass,3:utc(su) */
         int flag;           /* general purpose flag */
         int outtype;        /* output message type */
-        byte buff[MAXRAWLEN]; /* message buffer */
-        char opt[256];      /* receiver dependent options */
-        half_cyc_t *half_cyc; /* half-cycle correction list */
+        char[] buff = new char[MAXRAWLEN]; /* message buffer */
+        char[] opt = new char[256];      /* receiver dependent options */
+        List<half_cyc_t> half_cyc = new ArrayList<half_cyc_t>(); /* half-cycle correction list */
 
         int format;         /* receiver stream format */
-        void *rcv_data;     /* receiver dependent data */
+        // todo: Find out data type of this argument
+        // void *rcv_data;     /* receiver dependent data */
     } ;
 
     public class stream_t {        /* stream type */
@@ -1178,19 +1188,21 @@ const char *comment; /* option comment/enum labels/unit */
         int tick_o; /* output tick */
         int tact;  /* active tick */
         int inbt,outbt; /* input/output bytes at tick */
-        lock_t lock;        /* lock flag */
-        void *port;         /* type dependent port control struct */
-        char path[MAXSTRPATH]; /* stream path */
-        char msg [MAXSTRMSG];  /* stream message */
+        // todo: Need to deal with this later
+        // lock_t lock;        /* lock flag */
+        // todo: Need to find proper type for port
+        // void *port;         /* type dependent port control struct */
+        char[] path = new char[MAXSTRPATH]; /* stream path */
+        char[] msg = new char[MAXSTRMSG];  /* stream message */
     } ;
 
     public class strconv_t {        /* stream converter type */
         int itype,otype;    /* input and output stream type */
         int nmsg;           /* number of output messages */
-        int msgs[32];       /* output message types */
-        double tint[32];    /* output message intervals (s) */
-        int tick[32]; /* cycle tick of output message */
-        int ephsat[32];     /* satellites of output ephemeris */
+        int[] msgs = new int[32];       /* output message types */
+        double[] tint = new double[32];    /* output message intervals (s) */
+        int[] tick = new int[32]; /* cycle tick of output message */
+        int[] ephsat = new int[32];     /* satellites of output ephemeris */
         int stasel;         /* station info selection (0:remote,1:local) */
         rtcm_t rtcm;        /* rtcm input data buffer */
         raw_t raw;          /* raw  input data buffer */
@@ -1205,15 +1217,16 @@ const char *comment; /* option comment/enum labels/unit */
         int relayback;      /* relay back of output streams (0:no) */
         int nstr;           /* number of streams (1 input + (nstr-1) outputs */
         int npb;            /* data length in peek buffer (bytes) */
-        char cmds_periodic[16][MAXRCVCMD]; /* periodic commands */
-        double nmeapos[3];  /* NMEA request position (ecef) (m) */
-        byte *buff; /* input buffers */
-        byte *pbuf; /* peek buffer */
+        char[][] cmds_periodic = new char[16][MAXRCVCMD]; /* periodic commands */
+        double[] nmeapos = new double[3];  /* NMEA request position (ecef) (m) */
+        List<Byte> buff = new ArrayList<Byte>(); /* input buffers */
+        List<Byte> pbuf = new ArrayList<Byte>(); /* peek buffer */
         long tick;  /* start tick */
-        stream_t stream[16]; /* input/output streams */
-        strconv_t *conv[16]; /* stream converter */
-        thread_t thread;    /* server thread */
-        lock_t lock;        /* lock flag */
+        stream_t[] stream = new stream_t[16]; /* input/output streams */
+        List<strconv_t[]> conv = new ArrayList<strconv_t[]>(); /* stream converter, conv[16] */
+        // todo: I need to fix this later on
+        // thread_t thread;    /* server thread */
+        // lock_t lock;        /* lock flag */
     } ;
 
     public class rtksvr_t {        /* RTK server type */
@@ -1221,70 +1234,75 @@ const char *comment; /* option comment/enum labels/unit */
         int cycle;          /* processing cycle (ms) */
         int nmeacycle;      /* NMEA request cycle (ms) (0:no req) */
         int nmeareq;        /* NMEA request (0:no,1:nmeapos,2:single sol) */
-        double nmeapos[3];  /* NMEA request position (ecef) (m) */
+        double[] nmeapos = new double[3];  /* NMEA request position (ecef) (m) */
         int buffsize;       /* input buffer size (bytes) */
-        int format[3];      /* input format {rov,base,corr} */
-        solopt_t solopt[2]; /* output solution options {sol1,sol2} */
+        int[] format = new int[3];      /* input format {rov,base,corr} */
+        solopt_t[] solopt = new solopt_t[2]; /* output solution options {sol1,sol2} */
         int navsel;         /* ephemeris select (0:all,1:rover,2:base,3:corr) */
         int nsbs;           /* number of sbas message */
         int nsol;           /* number of solution buffer */
         rtk_t rtk;          /* RTK control/result struct */
-        int nb [3];         /* bytes in input buffers {rov,base} */
-        int nsb[2];         /* bytes in soulution buffers */
-        int npb[3];         /* bytes in input peek buffers */
-        byte *buff[3]; /* input buffers {rov,base,corr} */
-        byte *sbuf[2]; /* output buffers {sol1,sol2} */
-        byte *pbuf[3]; /* peek buffers {rov,base,corr} */
-        sol_t solbuf[MAXSOLBUF]; /* solution buffer */
-        long nmsg[3][10]; /* input message counts */
-        raw_t  raw [3];     /* receiver raw control {rov,base,corr} */
-        rtcm_t rtcm[3];     /* RTCM control {rov,base,corr} */
-        gtime_t ftime[3];   /* download time {rov,base,corr} */
-        char files[3][MAXSTRPATH]; /* download paths {rov,base,corr} */
-        obs_t obs[3][MAXOBSBUF]; /* observation data {rov,base,corr} */
+        int[] nb = new int[3];         /* bytes in input buffers {rov,base} */
+        int[] nsb = new int[2];         /* bytes in soulution buffers */
+        int[] npb = new int[3];         /* bytes in input peek buffers */
+        List<byte[]> buff = new ArrayList<byte[]>(); /* input buffers {rov[3],base[3],corr[3]} */
+        List<byte[]> sbuf = new ArrayList<byte[]>(); /* output buffers {sol1,sol2} */
+        List<byte[]> pbuf = new ArrayList<byte[]>(); /* peek buffers {rov,base,corr} */
+        sol_t[] solbuf = new sol_t[MAXSOLBUF]; /* solution buffer */
+        long[][] nmsg = new long[3][10]; /* input message counts */
+        raw_t[]  raw = new raw_t[3];     /* receiver raw control {rov,base,corr} */
+        rtcm_t[] rtcm = new rtcm_t[3];     /* RTCM control {rov,base,corr} */
+        gtime_t[] ftime = new gtime_t[3];   /* download time {rov,base,corr} */
+        char[][] files = new char[3][MAXSTRPATH]; /* download paths {rov,base,corr} */
+        obs_t[][] obs = new obs_t[3][MAXOBSBUF]; /* observation data {rov,base,corr} */
         nav_t nav;          /* navigation data */
-        sbsmsg_t sbsmsg[MAXSBSMSG]; /* SBAS message buffer */
-        stream_t stream[8]; /* streams {rov,base,corr,sol1,sol2,logr,logb,logc} */
-        stream_t *moni;     /* monitor stream */
+        sbsmsg_t[] sbsmsg = new sbsmsg_t[MAXSBSMSG]; /* SBAS message buffer */
+        stream_t[] stream = new stream_t[8]; /* streams {rov,base,corr,sol1,sol2,logr,logb,logc} */
+        List<stream_t> moni = new ArrayList<stream_t>();     /* monitor stream */
         long tick;  /* start tick */
-        thread_t thread;    /* server thread */
+        // todo: Need to find equther icon
+        //  ivalent thread in Java
+        // thread_t thread;    /* server thread */
         int cputime;        /* CPU time (ms) for a processing cycle */
         int prcout;         /* missing observation data count */
         int nave;           /* number of averaging base pos */
-        double rb_ave[3];   /* averaging base pos */
-        char cmds_periodic[3][MAXRCVCMD]; /* periodic commands */
-        char cmd_reset[MAXRCVCMD]; /* reset command */
+        double[] rb_ave = new double[3];   /* averaging base pos */
+        char[][] cmds_periodic = new char[3][MAXRCVCMD]; /* periodic commands */
+        char[] cmd_reset = new char[MAXRCVCMD]; /* reset command */
         double bl_reset;    /* baseline length to reset (km) */
-        lock_t lock;        /* lock flag */
+        // todo: Need to find equivalent locking systen in Java
+        //lock_t lock;        /* lock flag */
     } ;
 
     public class gis_pnt_t {        /* gis data point type */
-        double pos[3];      /* point data {lat,lon,height} (rad,m) */
+        double[] pos = new double[3];      /* point data {lat,lon,height} (rad,m) */
     } ;
 
     public class gis_poly_t {        /* gis data polyline type */
         int npnt;           /* number of points */
-        double bound[4];    /* boundary {lat0,lat1,lon0,lon1} */
-        double *pos;        /* position data (3 x npnt) */
+        double[] bound = new double[4];    /* boundary {lat0,lat1,lon0,lon1} */
+        List<double[]> pos = new ArrayList<double[]>();        /* position data (3 x npnt) */
     } ;
 
     public class gis_polygon_t {        /* gis data polygon type */
         int npnt;           /* number of points */
-        double bound[4];    /* boundary {lat0,lat1,lon0,lon1} */
-        double *pos;        /* position data (3 x npnt) */
+        double[] bound = new double[4];    /* boundary {lat0,lat1,lon0,lon1} */
+        List<double[]> pos = new ArrayList<double[]>();        /* position data (3 x npnt) */
     } ;
 
     public class gisd_t { /* gis data list type */
         int type;           /* data type (1:point,2:polyline,3:polygon) */
-        void *data;         /* data body */
-        struct gisd_tag *next; /* pointer to next */
+        // Need to find this data type
+        // void *data;         /* data body */
+        // todo: I think this is a linked struct
+        gisd_t next; /* pointer to next */
     } ;
 
     public class gis_t {        /* gis type */
-        char name[MAXGISLAYER][256]; /* name */
-        int flag[MAXGISLAYER];     /* flag */
-        gisd_t *data[MAXGISLAYER]; /* gis data list */
-        double bound[4];    /* boundary {lat0,lat1,lon0,lon1} */
+        char[][] name = new char[MAXGISLAYER][256]; /* name */
+        int[] flag =  new int[MAXGISLAYER];     /* flag */
+        List<gisd_t[]> data = new ArrayList<gisd_t[]>(); /* gis data list with internal array of [MAXGISLAYER] */
+        double[] bound = new double[4];    /* boundary {lat0,lat1,lon0,lon1} */
     } ;
 
     public class imud_t {        /* imu data type */
@@ -1292,13 +1310,13 @@ const char *comment; /* option comment/enum labels/unit */
         int stat;           /* status */
         int seqno;          /* sequence number */
         float temp;         /* temperature (C) */
-        double rot[3];      /* rotation rate {x,y,z} (rad/s) */
-        double acc[3];      /* acceleration data {x,y,z} (m/s^2) */
+        double[] rot = new double[3];      /* rotation rate {x,y,z} (rad/s) */
+        double[] acc = new double[3];      /* acceleration data {x,y,z} (m/s^2) */
     } ;
 
     public class imu_t {        /* imu type */
         imud_t data;        /* imu data */
         int nbyte;          /* bytes in imu data buffer */
-        byte buff[256]; /* imu data buffer */
+        byte[] buff = new byte[256]; /* imu data buffer */
     } ;
 }
