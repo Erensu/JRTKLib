@@ -36,410 +36,410 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class rtklib {
-    /* constants -----------------------------------------------------------------*/
-    final String VER_RTKLIB = "2.4.3";             /* library version */
-    final String PATCH_LEVEL= "b31";               /* patch level */
-    final String COPYRIGHT_RTKLIB = "Copyright (C) 2007-2018 T.Takasu\nAll rights reserved.";
+    /* constant -----------------------------------------------------------------*/
+    public static final String VER_RTKLIB = "2.4.3";             /* library version */
+    public static final String PATCH_LEVEL= "b31";               /* patch level */
+    public static final String COPYRIGHT_RTKLIB = "Copyright (C) 2007-2018 T.Takasu\nAll rights reserved.";
 
-    final double PI          = 3.1415926535897932;  /* pi */
-    final double D2R         = (PI/180.0);          /* deg to rad */
-    final double R2D         = (180.0/PI);          /* rad to deg */
-    final double CLIGHT      = 299792458.0;         /* speed of light (m/s) */
-    final double SC2RAD      = 3.1415926535898;     /* semi-circle to radian (IS-GPS) */
-    final double AU          = 149597870691.0;      /* 1 AU (m) */
-    final double AS2R        = (D2R/3600.0)  ;      /* arc sec to radian */
+    public static final double PI          = 3.1415926535897932;  /* pi */
+    public static final double D2R         = (PI/180.0);          /* deg to rad */
+    public static final double R2D         = (180.0/PI);          /* rad to deg */
+    public static final double CLIGHT      = 299792458.0;         /* speed of light (m/s) */
+    public static final double SC2RAD      = 3.1415926535898;     /* semi-circle to radian (IS-GPS) */
+    public static final double AU          = 149597870691.0;      /* 1 AU (m) */
+    public static final double AS2R        = (D2R/3600.0)  ;      /* arc sec to radian */
 
-    final double OMGE        = 7.2921151467E-5 ;    /* earth angular velocity (IS-GPS) (rad/s) */
+    public static final double OMGE        = 7.2921151467E-5 ;    /* earth angular velocity (IS-GPS) (rad/s) */
 
-    final double RE_WGS84    = 6378137.0 ;          /* earth semimajor axis (WGS84) (m) */
-    final double FE_WGS84    = (1.0/298.257223563); /* earth flattening (WGS84) */
+    public static final double RE_WGS84    = 6378137.0 ;          /* earth semimajor axis (WGS84) (m) */
+    public static final double FE_WGS84    = (1.0/298.257223563); /* earth flattening (WGS84) */
 
-    final double HION        = 350000.0;            /* ionosphere height (m) */
+    public static final double HION        = 350000.0;            /* ionosphere height (m) */
 
-    final double MAXFREQ     = 7 ;                  /* max NFREQ */
+    public static final int MAXFREQ     = 7 ;                  /* max NFREQ */
 
-    final double FREQ1       = 1.57542E9 ;          /* L1/E1  frequency (Hz) */
-    final double FREQ2       = 1.22760E9 ;          /* L2     frequency (Hz) */
-    final double FREQ5       = 1.17645E9 ;          /* L5/E5a frequency (Hz) */
-    final double FREQ6       = 1.27875E9 ;          /* E6/LEX frequency (Hz) */
-    final double FREQ7       = 1.20714E9 ;          /* E5b    frequency (Hz) */
-    final double FREQ8       = 1.191795E9;          /* E5a+b  frequency (Hz) */
-    final double FREQ9       = 2.492028E9;          /* S      frequency (Hz) */
-    final double FREQ1_GLO   = 1.60200E9;           /* GLONASS G1 base frequency (Hz) */
-    final double DFRQ1_GLO   = 0.56250E6;           /* GLONASS G1 bias frequency (Hz/n) */
-    final double FREQ2_GLO   = 1.24600E9;           /* GLONASS G2 base frequency (Hz) */
-    final double DFRQ2_GLO   = 0.43750E6;           /* GLONASS G2 bias frequency (Hz/n) */
-    final double FREQ3_GLO   = 1.202025E9;          /* GLONASS G3 frequency (Hz) */
-    final double FREQ1_CMP   = 1.561098E9;          /* BeiDou B1 frequency (Hz) */
-    final double FREQ2_CMP   = 1.20714E9;           /* BeiDou B2 frequency (Hz) */
-    final double FREQ3_CMP   = 1.26852E9;           /* BeiDou B3 frequency (Hz) */
+    public static final double FREQ1       = 1.57542E9 ;          /* L1/E1  frequency (Hz) */
+    public static final double FREQ2       = 1.22760E9 ;          /* L2     frequency (Hz) */
+    public static final double FREQ5       = 1.17645E9 ;          /* L5/E5a frequency (Hz) */
+    public static final double FREQ6       = 1.27875E9 ;          /* E6/LEX frequency (Hz) */
+    public static final double FREQ7       = 1.20714E9 ;          /* E5b    frequency (Hz) */
+    public static final double FREQ8       = 1.191795E9;          /* E5a+b  frequency (Hz) */
+    public static final double FREQ9       = 2.492028E9;          /* S      frequency (Hz) */
+    public static final double FREQ1_GLO   = 1.60200E9;           /* GLONASS G1 base frequency (Hz) */
+    public static final double DFRQ1_GLO   = 0.56250E6;           /* GLONASS G1 bias frequency (Hz/n) */
+    public static final double FREQ2_GLO   = 1.24600E9;           /* GLONASS G2 base frequency (Hz) */
+    public static final double DFRQ2_GLO   = 0.43750E6;           /* GLONASS G2 bias frequency (Hz/n) */
+    public static final double FREQ3_GLO   = 1.202025E9;          /* GLONASS G3 frequency (Hz) */
+    public static final double FREQ1_CMP   = 1.561098E9;          /* BeiDou B1 frequency (Hz) */
+    public static final double FREQ2_CMP   = 1.20714E9;           /* BeiDou B2 frequency (Hz) */
+    public static final double FREQ3_CMP   = 1.26852E9;           /* BeiDou B3 frequency (Hz) */
 
-    final double EFACT_GPS   = 1.0;                 /* error factor: GPS */
-    final double EFACT_GLO   = 1.5;                 /* error factor: GLONASS */
-    final double EFACT_GAL   = 1.0;                 /* error factor: Galileo */
-    final double EFACT_QZS   = 1.0;                 /* error factor: QZSS */
-    final double EFACT_CMP   = 1.0;                 /* error factor: BeiDou */
-    final double EFACT_IRN   = 1.5;                 /* error factor: IRNSS */
-    final double EFACT_SBS   = 3.0;                 /* error factor: SBAS */
+    public static final double EFACT_GPS   = 1.0;                 /* error factor: GPS */
+    public static final double EFACT_GLO   = 1.5;                 /* error factor: GLONASS */
+    public static final double EFACT_GAL   = 1.0;                 /* error factor: Galileo */
+    public static final double EFACT_QZS   = 1.0;                 /* error factor: QZSS */
+    public static final double EFACT_CMP   = 1.0;                 /* error factor: BeiDou */
+    public static final double EFACT_IRN   = 1.5;                 /* error factor: IRNSS */
+    public static final double EFACT_SBS   = 3.0;                 /* error factor: SBAS */
 
-    final double SYS_NONE    = 0x00;                /* navigation system: none */
-    final double SYS_GPS     = 0x01;                /* navigation system: GPS */
-    final double SYS_SBS     = 0x02;                /* navigation system: SBAS */
-    final double SYS_GLO     = 0x04;                /* navigation system: GLONASS */
-    final double SYS_GAL     = 0x08;                /* navigation system: Galileo */
-    final double SYS_QZS     = 0x10;                /* navigation system: QZSS */
-    final double SYS_CMP     = 0x20;                /* navigation system: BeiDou */
-    final double SYS_IRN     = 0x40;                /* navigation system: IRNS */
-    final double SYS_LEO     = 0x80;                /* navigation system: LEO */
-    final double SYS_ALL     = 0xFF;                /* navigation system: all */
+    public static final int SYS_NONE    = 0x00;                /* navigation system: none */
+    public static final int SYS_GPS     = 0x01;                /* navigation system: GPS */
+    public static final int SYS_SBS     = 0x02;                /* navigation system: SBAS */
+    public static final int SYS_GLO     = 0x04;                /* navigation system: GLONASS */
+    public static final int SYS_GAL     = 0x08;                /* navigation system: Galileo */
+    public static final int SYS_QZS     = 0x10;                /* navigation system: QZSS */
+    public static final int SYS_CMP     = 0x20;                /* navigation system: BeiDou */
+    public static final int SYS_IRN     = 0x40;                /* navigation system: IRNS */
+    public static final int SYS_LEO     = 0x80;                /* navigation system: LEO */
+    public static final int SYS_ALL     = 0xFF;                /* navigation system: all */
 
-    final int TSYS_GPS    = 0;                   /* time system: GPS time */
-    final int TSYS_UTC    = 1;                   /* time system: UTC */
-    final int TSYS_GLO    = 2;                   /* time system: GLONASS time */
-    final int TSYS_GAL    = 3;                   /* time system: Galileo time */
-    final int TSYS_QZS    = 4;                   /* time system: QZSS time */
-    final int TSYS_CMP    = 5;                   /* time system: BeiDou time */
-    final int TSYS_IRN    = 6;                   /* time system: IRNSS time */
+    public static final int TSYS_GPS    = 0;                   /* time system: GPS time */
+    public static final int TSYS_UTC    = 1;                   /* time system: UTC */
+    public static final int TSYS_GLO    = 2;                   /* time system: GLONASS time */
+    public static final int TSYS_GAL    = 3;                   /* time system: Galileo time */
+    public static final int TSYS_QZS    = 4;                   /* time system: QZSS time */
+    public static final int TSYS_CMP    = 5;                   /* time system: BeiDou time */
+    public static final int TSYS_IRN    = 6;                   /* time system: IRNSS time */
 
-    final int NFREQ       = 3;                   /* number of carrier frequencies */
-    final int NFREQGLO    = 2;                   /* number of carrier frequencies of GLONASS */
+    public static final int NFREQ       = 3;                   /* number of carrier frequencies */
+    public static final int NFREQGLO    = 2;                   /* number of carrier frequencies of GLONASS */
 
-    final int NEXOBS      = 0;                   /* number of extended obs codes */
+    public static final int NEXOBS      = 0;                   /* number of extended obs codes */
 
-    final int MINPRNGPS   = 1;                   /* min satellite PRN number of GPS */
-    final int MAXPRNGPS   = 32;                  /* max satellite PRN number of GPS */
-    final int NSATGPS     = (MAXPRNGPS-MINPRNGPS+1); /* number of GPS satellites */
-    final int NSYSGPS     = 1;
+    public static final int MINPRNGPS   = 1;                   /* min satellite PRN number of GPS */
+    public static final int MAXPRNGPS   = 32;                  /* max satellite PRN number of GPS */
+    public static final int NSATGPS     = (MAXPRNGPS-MINPRNGPS+1); /* number of GPS satellites */
+    public static final int NSYSGPS     = 1;
 
-    final int MINPRNGLO   = 1;                   /* min satellite slot number of GLONASS */
-    final int MAXPRNGLO   = 27;                  /* max satellite slot number of GLONASS */
-    final int NSATGLO     = (MAXPRNGLO-MINPRNGLO+1); /* number of GLONASS satellites */
-    final int NSYSGLO     = 1;
+    public static final int MINPRNGLO   = 1;                   /* min satellite slot number of GLONASS */
+    public static final int MAXPRNGLO   = 27;                  /* max satellite slot number of GLONASS */
+    public static final int NSATGLO     = (MAXPRNGLO-MINPRNGLO+1); /* number of GLONASS satellites */
+    public static final int NSYSGLO     = 1;
 
-    final int MINPRNGAL   = 1;                   /* min satellite PRN number of Galileo */
-    final int MAXPRNGAL   = 36;                  /* max satellite PRN number of Galileo */
-    final int NSATGAL     = (MAXPRNGAL-MINPRNGAL+1); /* number of Galileo satellites */
-    final int NSYSGAL     = 1;
+    public static final int MINPRNGAL   = 1;                   /* min satellite PRN number of Galileo */
+    public static final int MAXPRNGAL   = 36;                  /* max satellite PRN number of Galileo */
+    public static final int NSATGAL     = (MAXPRNGAL-MINPRNGAL+1); /* number of Galileo satellites */
+    public static final int NSYSGAL     = 1;
 
-    final int MINPRNQZS   = 193;                 /* min satellite PRN number of QZSS */
-    final int MAXPRNQZS   = 202;                 /* max satellite PRN number of QZSS */
-    final int MINPRNQZS_S = 183;                 /* min satellite PRN number of QZSS SAIF */
-    final int MAXPRNQZS_S = 191;                 /* max satellite PRN number of QZSS SAIF */
-    final int NSATQZS     = (MAXPRNQZS-MINPRNQZS+1); /* number of QZSS satellites */
-    final int NSYSQZS     = 1;
+    public static final int MINPRNQZS   = 193;                 /* min satellite PRN number of QZSS */
+    public static final int MAXPRNQZS   = 202;                 /* max satellite PRN number of QZSS */
+    public static final int MINPRNQZS_S = 183;                 /* min satellite PRN number of QZSS SAIF */
+    public static final int MAXPRNQZS_S = 191;                 /* max satellite PRN number of QZSS SAIF */
+    public static final int NSATQZS     = (MAXPRNQZS-MINPRNQZS+1); /* number of QZSS satellites */
+    public static final int NSYSQZS     = 1;
 
-    final int MINPRNCMP   = 1;                   /* min satellite sat number of BeiDou */
-    final int MAXPRNCMP   = 35;                  /* max satellite sat number of BeiDou */
-    final int NSATCMP     = (MAXPRNCMP-MINPRNCMP+1); /* number of BeiDou satellites */
-    final int NSYSCMP     = 1;
+    public static final int MINPRNCMP   = 1;                   /* min satellite sat number of BeiDou */
+    public static final int MAXPRNCMP   = 35;                  /* max satellite sat number of BeiDou */
+    public static final int NSATCMP     = (MAXPRNCMP-MINPRNCMP+1); /* number of BeiDou satellites */
+    public static final int NSYSCMP     = 1;
 
-    final int MINPRNIRN   = 1;                   /* min satellite sat number of IRNSS */
-    final int MAXPRNIRN   = 7;                   /* max satellite sat number of IRNSS */
-    final int NSATIRN     = (MAXPRNIRN-MINPRNIRN+1); /* number of IRNSS satellites */
-    final int NSYSIRN     = 1;
+    public static final int MINPRNIRN   = 1;                   /* min satellite sat number of IRNSS */
+    public static final int MAXPRNIRN   = 7;                   /* max satellite sat number of IRNSS */
+    public static final int NSATIRN     = (MAXPRNIRN-MINPRNIRN+1); /* number of IRNSS satellites */
+    public static final int NSYSIRN     = 1;
 
-    final int MINPRNLEO   = 1;                   /* min satellite sat number of LEO */
-    final int MAXPRNLEO   = 10;                  /* max satellite sat number of LEO */
-    final int NSATLEO     = (MAXPRNLEO-MINPRNLEO+1); /* number of LEO satellites */
-    final int NSYSLEO     = 1;
+    public static final int MINPRNLEO   = 1;                   /* min satellite sat number of LEO */
+    public static final int MAXPRNLEO   = 10;                  /* max satellite sat number of LEO */
+    public static final int NSATLEO     = (MAXPRNLEO-MINPRNLEO+1); /* number of LEO satellites */
+    public static final int NSYSLEO     = 1;
 
-    final int NSYS        = (NSYSGPS+NSYSGLO+NSYSGAL+NSYSQZS+NSYSCMP+NSYSIRN+NSYSLEO); /* number of systems */
+    public static final int NSYS        = (NSYSGPS+NSYSGLO+NSYSGAL+NSYSQZS+NSYSCMP+NSYSIRN+NSYSLEO); /* number of systems */
 
-    final int MINPRNSBS   = 120;                 /* min satellite PRN number of SBAS */
-    final int MAXPRNSBS   = 142;                 /* max satellite PRN number of SBAS */
-    final int NSATSBS     = (MAXPRNSBS-MINPRNSBS+1); /* number of SBAS satellites */
+    public static final int MINPRNSBS   = 120;                 /* min satellite PRN number of SBAS */
+    public static final int MAXPRNSBS   = 142;                 /* max satellite PRN number of SBAS */
+    public static final int NSATSBS     = (MAXPRNSBS-MINPRNSBS+1); /* number of SBAS satellites */
 
-    final int MAXSAT      = (NSATGPS+NSATGLO+NSATGAL+NSATQZS+NSATCMP+NSATIRN+NSATSBS+NSATLEO);
+    public static final int MAXSAT      = (NSATGPS+NSATGLO+NSATGAL+NSATQZS+NSATCMP+NSATIRN+NSATSBS+NSATLEO);
             /* max satellite number (1 to MAXSAT) */
-    final int MAXSTA      = 255;
+    public static final int MAXSTA      = 255;
 
 
-    final int MAXOBS      = 64;                  /* max number of obs in an epoch */
+    public static final int MAXOBS      = 64;                  /* max number of obs in an epoch */
 
-    final int MAXRCV      = 64;                  /* max receiver number (1 to MAXRCV) */
-    final int MAXOBSTYPE  = 64;                  /* max number of obs type in RINEX */
+    public static final int MAXRCV      = 64;                  /* max receiver number (1 to MAXRCV) */
+    public static final int MAXOBSTYPE  = 64;                  /* max number of obs type in RINEX */
 
-    final double DTTOL       = 0.005;               /* tolerance of time difference (s) */
+    public static final double DTTOL       = 0.005;               /* tolerance of time difference (s) */
 
-    final double MAXDTOE     = 7200.0;              /* max time difference to GPS Toe (s) */
-    final double MAXDTOE_QZS = 7200.0;              /* max time difference to QZSS Toe (s) */
-    final double MAXDTOE_GAL = 14400.0;             /* max time difference to Galileo Toe (s) */
-    final double MAXDTOE_CMP = 21600.0;             /* max time difference to BeiDou Toe (s) */
-    final double MAXDTOE_GLO = 1800.0;              /* max time difference to GLONASS Toe (s) */
-    final double MAXDTOE_SBS = 360.0;               /* max time difference to SBAS Toe (s) */
-    final double MAXDTOE_S   = 86400.0;             /* max time difference to ephem toe (s) for other */
-    final double MAXGDOP     = 300.0;               /* max GDOP */
+    public static final double MAXDTOE     = 7200.0;              /* max time difference to GPS Toe (s) */
+    public static final double MAXDTOE_QZS = 7200.0;              /* max time difference to QZSS Toe (s) */
+    public static final double MAXDTOE_GAL = 14400.0;             /* max time difference to Galileo Toe (s) */
+    public static final double MAXDTOE_CMP = 21600.0;             /* max time difference to BeiDou Toe (s) */
+    public static final double MAXDTOE_GLO = 1800.0;              /* max time difference to GLONASS Toe (s) */
+    public static final double MAXDTOE_SBS = 360.0;               /* max time difference to SBAS Toe (s) */
+    public static final double MAXDTOE_S   = 86400.0;             /* max time difference to ephem toe (s) for other */
+    public static final double MAXGDOP     = 300.0;               /* max GDOP */
 
-    final double INT_SWAP_TRAC = 86400.0;           /* swap interval of trace file (s) */
-    final double INT_SWAP_STAT = 86400.0;           /* swap interval of solution status file (s) */
+    public static final double INT_SWAP_TRAC = 86400.0;           /* swap interval of trace file (s) */
+    public static final double INT_SWAP_STAT = 86400.0;           /* swap interval of solution status file (s) */
 
-    final double MAXEXFILE   = 1024;                /* max number of expanded files */
-    final double MAXSBSAGEF  = 30.0;                /* max age of SBAS fast correction (s) */
-    final double MAXSBSAGEL  = 1800.0;              /* max age of SBAS long term corr (s) */
-    final int MAXSBSURA   = 8;                   /* max URA of SBAS satellite */
-    final int MAXBAND     = 10;                  /* max SBAS band of IGP */
-    final int MAXNIGP     = 201;                 /* max number of IGP in SBAS band */
-    final int MAXNGEO     = 4;                   /* max number of GEO satellites */
-    final int MAXCOMMENT  = 10;                  /* max number of RINEX comments */
-    final int MAXSTRPATH  = 1024;                /* max length of stream path */
-    final int MAXSTRMSG   = 1024;                /* max length of stream message */
-    final int MAXSTRRTK   = 8;                   /* max number of stream in RTK server */
-    final int MAXSBSMSG   = 32;                  /* max number of SBAS msg in RTK server */
-    final int MAXSOLMSG   = 8191;                /* max length of solution message */
-    final int MAXRAWLEN   = 4096;                /* max length of receiver raw message */
-    final int MAXERRMSG   = 4096;                /* max length of error/warning message */
-    final int MAXANT      = 64;                  /* max length of station name/antenna type */
-    final int MAXSOLBUF   = 256;                 /* max number of solution buffer */
-    final int MAXOBSBUF   = 128;                 /* max number of observation data buffer */
-    final int MAXNRPOS    = 16;                  /* max number of reference positions */
-    final int MAXLEAPS    = 64;                  /* max number of leap seconds table */
-    final int MAXGISLAYER = 32;                  /* max number of GIS data layers */
-    final int MAXRCVCMD   = 4096;                /* max length of receiver commands */
+    public static final double MAXEXFILE   = 1024;                /* max number of expanded files */
+    public static final double MAXSBSAGEF  = 30.0;                /* max age of SBAS fast correction (s) */
+    public static final double MAXSBSAGEL  = 1800.0;              /* max age of SBAS long term corr (s) */
+    public static final int MAXSBSURA   = 8;                   /* max URA of SBAS satellite */
+    public static final int MAXBAND     = 10;                  /* max SBAS band of IGP */
+    public static final int MAXNIGP     = 201;                 /* max number of IGP in SBAS band */
+    public static final int MAXNGEO     = 4;                   /* max number of GEO satellites */
+    public static final int MAXCOMMENT  = 10;                  /* max number of RINEX comments */
+    public static final int MAXSTRPATH  = 1024;                /* max length of stream path */
+    public static final int MAXSTRMSG   = 1024;                /* max length of stream message */
+    public static final int MAXSTRRTK   = 8;                   /* max number of stream in RTK server */
+    public static final int MAXSBSMSG   = 32;                  /* max number of SBAS msg in RTK server */
+    public static final int MAXSOLMSG   = 8191;                /* max length of solution message */
+    public static final int MAXRAWLEN   = 4096;                /* max length of receiver raw message */
+    public static final int MAXERRMSG   = 4096;                /* max length of error/warning message */
+    public static final int MAXANT      = 64;                  /* max length of station name/antenna type */
+    public static final int MAXSOLBUF   = 256;                 /* max number of solution buffer */
+    public static final int MAXOBSBUF   = 128;                 /* max number of observation data buffer */
+    public static final int MAXNRPOS    = 16;                  /* max number of reference positions */
+    public static final int MAXLEAPS    = 64;                  /* max number of leap seconds table */
+    public static final int MAXGISLAYER = 32;                  /* max number of GIS data layers */
+    public static final int MAXRCVCMD   = 4096;                /* max length of receiver commands */
 
-    final double RNX2VER     = 2.10;                /* RINEX ver.2 default output version */
-    final double RNX3VER     = 3.00;                /* RINEX ver.3 default output version */
+    public static final double RNX2VER     = 2.10;                /* RINEX ver.2 default output version */
+    public static final double RNX3VER     = 3.00;                /* RINEX ver.3 default output version */
 
-    final int OBSTYPE_PR  = 0x01;                /* observation type: pseudorange */
-    final int OBSTYPE_CP  = 0x02;                /* observation type: carrier-phase */
-    final int OBSTYPE_DOP = 0x04;                /* observation type: doppler-freq */
-    final int OBSTYPE_SNR = 0x08;                /* observation type: SNR */
-    final int OBSTYPE_ALL = 0xFF;                /* observation type: all */
+    public static final int OBSTYPE_PR  = 0x01;                /* observation type: pseudorange */
+    public static final int OBSTYPE_CP  = 0x02;                /* observation type: carrier-phase */
+    public static final int OBSTYPE_DOP = 0x04;                /* observation type: doppler-freq */
+    public static final int OBSTYPE_SNR = 0x08;                /* observation type: SNR */
+    public static final int OBSTYPE_ALL = 0xFF;                /* observation type: all */
 
-    final int FREQTYPE_L1 = 0x01;                /* frequency type: L1/E1 */
-    final int FREQTYPE_L2 = 0x02;                /* frequency type: L2/B1 */
-    final int FREQTYPE_L5 = 0x04;                /* frequency type: L5/E5a/L3 */
-    final int FREQTYPE_L6 = 0x08;                /* frequency type: E6/LEX/B3 */
-    final int FREQTYPE_L7 = 0x10;                /* frequency type: E5b/B2 */
-    final int FREQTYPE_L8 = 0x20;                /* frequency type: E5(a+b) */
-    final int FREQTYPE_L9 = 0x40;                /* frequency type: S */
-    final int FREQTYPE_ALL = 0xFF;               /* frequency type: all */
+    public static final int FREQTYPE_L1 = 0x01;                /* frequency type: L1/E1 */
+    public static final int FREQTYPE_L2 = 0x02;                /* frequency type: L2/B1 */
+    public static final int FREQTYPE_L5 = 0x04;                /* frequency type: L5/E5a/L3 */
+    public static final int FREQTYPE_L6 = 0x08;                /* frequency type: E6/LEX/B3 */
+    public static final int FREQTYPE_L7 = 0x10;                /* frequency type: E5b/B2 */
+    public static final int FREQTYPE_L8 = 0x20;                /* frequency type: E5(a+b) */
+    public static final int FREQTYPE_L9 = 0x40;                /* frequency type: S */
+    public static final int FREQTYPE_ALL = 0xFF;               /* frequency type: all */
 
-    final int CODE_NONE   = 0;                   /* obs code: none or unknown */
-    final int CODE_L1C    = 1;                   /* obs code: L1C/A,G1C/A,E1C (GPS,GLO,GAL,QZS,SBS) */
-    final int CODE_L1P    = 2;                   /* obs code: L1P,G1P    (GPS,GLO) */
-    final int CODE_L1W    = 3;                   /* obs code: L1 Z-track (GPS) */
-    final int CODE_L1Y    = 4;                   /* obs code: L1Y        (GPS) */
-    final int CODE_L1M    = 5;                   /* obs code: L1M        (GPS) */
-    final int CODE_L1N    = 6;                   /* obs code: L1codeless (GPS) */
-    final int CODE_L1S    = 7;                   /* obs code: L1C(D)     (GPS,QZS) */
-    final int CODE_L1L    = 8;                   /* obs code: L1C(P)     (GPS,QZS) */
-    final int CODE_L1E    = 9;                   /* (not used) */
-    final int CODE_L1A    = 10;                  /* obs code: E1A        (GAL) */
-    final int CODE_L1B    = 11;                  /* obs code: E1B        (GAL) */
-    final int CODE_L1X    = 12;                  /* obs code: E1B+C,L1C(D+P) (GAL,QZS) */
-    final int CODE_L1Z    = 13;                  /* obs code: E1A+B+C,L1SAIF (GAL,QZS) */
-    final int CODE_L2C    = 14;                  /* obs code: L2C/A,G1C/A (GPS,GLO) */
-    final int CODE_L2D    = 15;                  /* obs code: L2 L1C/A-(P2-P1) (GPS) */
-    final int CODE_L2S    = 16;                  /* obs code: L2C(M)     (GPS,QZS) */
-    final int CODE_L2L    = 17;                  /* obs code: L2C(L)     (GPS,QZS) */
-    final int CODE_L2X    = 18;                  /* obs code: L2C(M+L),B1I+Q (GPS,QZS,CMP) */
-    final int CODE_L2P    = 19;                  /* obs code: L2P,G2P    (GPS,GLO) */
-    final int CODE_L2W    = 20;                  /* obs code: L2 Z-track (GPS) */
-    final int CODE_L2Y    = 21;                  /* obs code: L2Y        (GPS) */
-    final int CODE_L2M    = 22;                  /* obs code: L2M        (GPS) */
-    final int CODE_L2N    = 23;                  /* obs code: L2codeless (GPS) */
-    final int CODE_L5I    = 24;                  /* obs code: L5/E5aI    (GPS,GAL,QZS,SBS) */
-    final int CODE_L5Q    = 25;                  /* obs code: L5/E5aQ    (GPS,GAL,QZS,SBS) */
-    final int CODE_L5X    = 26;                  /* obs code: L5/E5aI+Q/L5B+C (GPS,GAL,QZS,IRN,SBS) */
-    final int CODE_L7I    = 27;                  /* obs code: E5bI,B2I   (GAL,CMP) */
-    final int CODE_L7Q    = 28;                  /* obs code: E5bQ,B2Q   (GAL,CMP) */
-    final int CODE_L7X    = 29;                  /* obs code: E5bI+Q,B2I+Q (GAL,CMP) */
-    final int CODE_L6A    = 30;                  /* obs code: E6A        (GAL) */
-    final int CODE_L6B    = 31;                  /* obs code: E6B        (GAL) */
-    final int CODE_L6C    = 32;                  /* obs code: E6C        (GAL) */
-    final int CODE_L6X    = 33;                  /* obs code: E6B+C,LEXS+L,B3I+Q (GAL,QZS,CMP) */
-    final int CODE_L6Z    = 34;                  /* obs code: E6A+B+C    (GAL) */
-    final int CODE_L6S    = 35;                  /* obs code: LEXS       (QZS) */
-    final int CODE_L6L    = 36;                  /* obs code: LEXL       (QZS) */
-    final int CODE_L8I    = 37;                  /* obs code: E5(a+b)I   (GAL) */
-    final int CODE_L8Q    = 38;                  /* obs code: E5(a+b)Q   (GAL) */
-    final int CODE_L8X    = 39;                  /* obs code: E5(a+b)I+Q (GAL) */
-    final int CODE_L2I    = 40;                  /* obs code: B1I        (BDS) */
-    final int CODE_L2Q    = 41;                  /* obs code: B1Q        (BDS) */
-    final int CODE_L6I    = 42;                  /* obs code: B3I        (BDS) */
-    final int CODE_L6Q    = 43;                  /* obs code: B3Q        (BDS) */
-    final int CODE_L3I    = 44;                  /* obs code: G3I        (GLO) */
-    final int CODE_L3Q    = 45;                  /* obs code: G3Q        (GLO) */
-    final int CODE_L3X    = 46;                  /* obs code: G3I+Q      (GLO) */
-    final int CODE_L1I    = 47;                  /* obs code: B1I        (BDS) */
-    final int CODE_L1Q    = 48;                  /* obs code: B1Q        (BDS) */
-    final int CODE_L5A    = 49;                  /* obs code: L5A SPS    (IRN) */
-    final int CODE_L5B    = 50;                  /* obs code: L5B RS(D)  (IRN) */
-    final int CODE_L5C    = 51;                  /* obs code: L5C RS(P)  (IRN) */
-    final int CODE_L9A    = 52;                  /* obs code: SA SPS     (IRN) */
-    final int CODE_L9B    = 53;                  /* obs code: SB RS(D)   (IRN) */
-    final int CODE_L9C    = 54;                  /* obs code: SC RS(P)   (IRN) */
-    final int CODE_L9X    = 55;                  /* obs code: SB+C       (IRN) */
-    final int MAXCODE     = 55;                  /* max number of obs code */
+    public static final int CODE_NONE   = 0;                   /* obs code: none or unknown */
+    public static final int CODE_L1C    = 1;                   /* obs code: L1C/A,G1C/A,E1C (GPS,GLO,GAL,QZS,SBS) */
+    public static final int CODE_L1P    = 2;                   /* obs code: L1P,G1P    (GPS,GLO) */
+    public static final int CODE_L1W    = 3;                   /* obs code: L1 Z-track (GPS) */
+    public static final int CODE_L1Y    = 4;                   /* obs code: L1Y        (GPS) */
+    public static final int CODE_L1M    = 5;                   /* obs code: L1M        (GPS) */
+    public static final int CODE_L1N    = 6;                   /* obs code: L1codeless (GPS) */
+    public static final int CODE_L1S    = 7;                   /* obs code: L1C(D)     (GPS,QZS) */
+    public static final int CODE_L1L    = 8;                   /* obs code: L1C(P)     (GPS,QZS) */
+    public static final int CODE_L1E    = 9;                   /* (not used) */
+    public static final int CODE_L1A    = 10;                  /* obs code: E1A        (GAL) */
+    public static final int CODE_L1B    = 11;                  /* obs code: E1B        (GAL) */
+    public static final int CODE_L1X    = 12;                  /* obs code: E1B+C,L1C(D+P) (GAL,QZS) */
+    public static final int CODE_L1Z    = 13;                  /* obs code: E1A+B+C,L1SAIF (GAL,QZS) */
+    public static final int CODE_L2C    = 14;                  /* obs code: L2C/A,G1C/A (GPS,GLO) */
+    public static final int CODE_L2D    = 15;                  /* obs code: L2 L1C/A-(P2-P1) (GPS) */
+    public static final int CODE_L2S    = 16;                  /* obs code: L2C(M)     (GPS,QZS) */
+    public static final int CODE_L2L    = 17;                  /* obs code: L2C(L)     (GPS,QZS) */
+    public static final int CODE_L2X    = 18;                  /* obs code: L2C(M+L),B1I+Q (GPS,QZS,CMP) */
+    public static final int CODE_L2P    = 19;                  /* obs code: L2P,G2P    (GPS,GLO) */
+    public static final int CODE_L2W    = 20;                  /* obs code: L2 Z-track (GPS) */
+    public static final int CODE_L2Y    = 21;                  /* obs code: L2Y        (GPS) */
+    public static final int CODE_L2M    = 22;                  /* obs code: L2M        (GPS) */
+    public static final int CODE_L2N    = 23;                  /* obs code: L2codeless (GPS) */
+    public static final int CODE_L5I    = 24;                  /* obs code: L5/E5aI    (GPS,GAL,QZS,SBS) */
+    public static final int CODE_L5Q    = 25;                  /* obs code: L5/E5aQ    (GPS,GAL,QZS,SBS) */
+    public static final int CODE_L5X    = 26;                  /* obs code: L5/E5aI+Q/L5B+C (GPS,GAL,QZS,IRN,SBS) */
+    public static final int CODE_L7I    = 27;                  /* obs code: E5bI,B2I   (GAL,CMP) */
+    public static final int CODE_L7Q    = 28;                  /* obs code: E5bQ,B2Q   (GAL,CMP) */
+    public static final int CODE_L7X    = 29;                  /* obs code: E5bI+Q,B2I+Q (GAL,CMP) */
+    public static final int CODE_L6A    = 30;                  /* obs code: E6A        (GAL) */
+    public static final int CODE_L6B    = 31;                  /* obs code: E6B        (GAL) */
+    public static final int CODE_L6C    = 32;                  /* obs code: E6C        (GAL) */
+    public static final int CODE_L6X    = 33;                  /* obs code: E6B+C,LEXS+L,B3I+Q (GAL,QZS,CMP) */
+    public static final int CODE_L6Z    = 34;                  /* obs code: E6A+B+C    (GAL) */
+    public static final int CODE_L6S    = 35;                  /* obs code: LEXS       (QZS) */
+    public static final int CODE_L6L    = 36;                  /* obs code: LEXL       (QZS) */
+    public static final int CODE_L8I    = 37;                  /* obs code: E5(a+b)I   (GAL) */
+    public static final int CODE_L8Q    = 38;                  /* obs code: E5(a+b)Q   (GAL) */
+    public static final int CODE_L8X    = 39;                  /* obs code: E5(a+b)I+Q (GAL) */
+    public static final int CODE_L2I    = 40;                  /* obs code: B1I        (BDS) */
+    public static final int CODE_L2Q    = 41;                  /* obs code: B1Q        (BDS) */
+    public static final int CODE_L6I    = 42;                  /* obs code: B3I        (BDS) */
+    public static final int CODE_L6Q    = 43;                  /* obs code: B3Q        (BDS) */
+    public static final int CODE_L3I    = 44;                  /* obs code: G3I        (GLO) */
+    public static final int CODE_L3Q    = 45;                  /* obs code: G3Q        (GLO) */
+    public static final int CODE_L3X    = 46;                  /* obs code: G3I+Q      (GLO) */
+    public static final int CODE_L1I    = 47;                  /* obs code: B1I        (BDS) */
+    public static final int CODE_L1Q    = 48;                  /* obs code: B1Q        (BDS) */
+    public static final int CODE_L5A    = 49;                  /* obs code: L5A SPS    (IRN) */
+    public static final int CODE_L5B    = 50;                  /* obs code: L5B RS(D)  (IRN) */
+    public static final int CODE_L5C    = 51;                  /* obs code: L5C RS(P)  (IRN) */
+    public static final int CODE_L9A    = 52;                  /* obs code: SA SPS     (IRN) */
+    public static final int CODE_L9B    = 53;                  /* obs code: SB RS(D)   (IRN) */
+    public static final int CODE_L9C    = 54;                  /* obs code: SC RS(P)   (IRN) */
+    public static final int CODE_L9X    = 55;                  /* obs code: SB+C       (IRN) */
+    public static final int MAXCODE     = 55;                  /* max number of obs code */
 
-    final int PMODE_SINGLE = 0;                  /* positioning mode: single */
-    final int PMODE_DGPS   = 1;                  /* positioning mode: DGPS/DGNSS */
-    final int PMODE_KINEMA = 2;                  /* positioning mode: kinematic */
-    final int PMODE_STATIC = 3;                  /* positioning mode: static */
-    final int PMODE_MOVEB  = 4;                  /* positioning mode: moving-base */
-    final int PMODE_FIXED  = 5;                  /* positioning mode: fixed */
-    final int PMODE_PPP_KINEMA = 6;             /* positioning mode: PPP-kinemaric */
-    final int PMODE_PPP_STATIC = 7;              /* positioning mode: PPP-static */
-    final int PMODE_PPP_FIXED = 8;               /* positioning mode: PPP-fixed */
+    public static final int PMODE_SINGLE = 0;                  /* positioning mode: single */
+    public static final int PMODE_DGPS   = 1;                  /* positioning mode: DGPS/DGNSS */
+    public static final int PMODE_KINEMA = 2;                  /* positioning mode: kinematic */
+    public static final int PMODE_STATIC = 3;                  /* positioning mode: static */
+    public static final int PMODE_MOVEB  = 4;                  /* positioning mode: moving-base */
+    public static final int PMODE_FIXED  = 5;                  /* positioning mode: fixed */
+    public static final int PMODE_PPP_KINEMA = 6;             /* positioning mode: PPP-kinemaric */
+    public static final int PMODE_PPP_STATIC = 7;              /* positioning mode: PPP-static */
+    public static final int PMODE_PPP_FIXED = 8;               /* positioning mode: PPP-fixed */
 
-    final int SOLF_LLH    = 0;                   /* solution format: lat/lon/height */
-    final int SOLF_XYZ    = 1;                   /* solution format: x/y/z-ecef */
-    final int SOLF_ENU    = 2;                   /* solution format: e/n/u-baseline */
-    final int SOLF_NMEA   = 3;                   /* solution format: NMEA-183 */
-    final int SOLF_STAT   = 4;                   /* solution format: solution status */
-    final int SOLF_GSIF   = 5;                   /* solution format: GSI F1/F2 */
+    public static final int SOLF_LLH    = 0;                   /* solution format: lat/lon/height */
+    public static final int SOLF_XYZ    = 1;                   /* solution format: x/y/z-ecef */
+    public static final int SOLF_ENU    = 2;                   /* solution format: e/n/u-baseline */
+    public static final int SOLF_NMEA   = 3;                   /* solution format: NMEA-183 */
+    public static final int SOLF_STAT   = 4;                   /* solution format: solution status */
+    public static final int SOLF_GSIF   = 5;                   /* solution format: GSI F1/F2 */
 
-    final int SOLQ_NONE   = 0;                   /* solution status: no solution */
-    final int SOLQ_FIX    = 1;                   /* solution status: fix */
-    final int SOLQ_FLOAT  = 2;                   /* solution status: float */
-    final int SOLQ_SBAS   = 3;                   /* solution status: SBAS */
-    final int SOLQ_DGPS   = 4;                   /* solution status: DGPS/DGNSS */
-    final int SOLQ_SINGLE = 5;                   /* solution status: single */
-    final int SOLQ_PPP    = 6;                   /* solution status: PPP */
-    final int SOLQ_DR     = 7;                   /* solution status: dead reconing */
-    final int MAXSOLQ     = 7;                   /* max number of solution status */
+    public static final int SOLQ_NONE   = 0;                   /* solution status: no solution */
+    public static final int SOLQ_FIX    = 1;                   /* solution status: fix */
+    public static final int SOLQ_FLOAT  = 2;                   /* solution status: float */
+    public static final int SOLQ_SBAS   = 3;                   /* solution status: SBAS */
+    public static final int SOLQ_DGPS   = 4;                   /* solution status: DGPS/DGNSS */
+    public static final int SOLQ_SINGLE = 5;                   /* solution status: single */
+    public static final int SOLQ_PPP    = 6;                   /* solution status: PPP */
+    public static final int SOLQ_DR     = 7;                   /* solution status: dead reconing */
+    public static final int MAXSOLQ     = 7;                   /* max number of solution status */
 
-    final int TIMES_GPST  = 0;                   /* time system: gps time */
-    final int TIMES_UTC   = 1;                   /* time system: utc */
-    final int TIMES_JST   = 2;                   /* time system: jst */
+    public static final int TIMES_GPST  = 0;                   /* time system: gps time */
+    public static final int TIMES_UTC   = 1;                   /* time system: utc */
+    public static final int TIMES_JST   = 2;                   /* time system: jst */
 
-    final int IONOOPT_OFF = 0;                   /* ionosphere option: correction off */
-    final int IONOOPT_BRDC = 1;                  /* ionosphere option: broadcast model */
-    final int IONOOPT_SBAS = 2;                  /* ionosphere option: SBAS model */
-    final int IONOOPT_IFLC = 3;                  /* ionosphere option: L1/L2 or L1/L5 iono-free LC */
-    final int IONOOPT_EST = 4;                   /* ionosphere option: estimation */
-    final int IONOOPT_TEC = 5;                   /* ionosphere option: IONEX TEC model */
-    final int IONOOPT_QZS = 6;                   /* ionosphere option: QZSS broadcast model */
-    final int IONOOPT_LEX = 7;                   /* ionosphere option: QZSS LEX ionospehre */
-    final int IONOOPT_STEC = 8;                  /* ionosphere option: SLANT TEC model */
+    public static final int IONOOPT_OFF = 0;                   /* ionosphere option: correction off */
+    public static final int IONOOPT_BRDC = 1;                  /* ionosphere option: broadcast model */
+    public static final int IONOOPT_SBAS = 2;                  /* ionosphere option: SBAS model */
+    public static final int IONOOPT_IFLC = 3;                  /* ionosphere option: L1/L2 or L1/L5 iono-free LC */
+    public static final int IONOOPT_EST = 4;                   /* ionosphere option: estimation */
+    public static final int IONOOPT_TEC = 5;                   /* ionosphere option: IONEX TEC model */
+    public static final int IONOOPT_QZS = 6;                   /* ionosphere option: QZSS broadcast model */
+    public static final int IONOOPT_LEX = 7;                   /* ionosphere option: QZSS LEX ionospehre */
+    public static final int IONOOPT_STEC = 8;                  /* ionosphere option: SLANT TEC model */
 
-    final int TROPOPT_OFF = 0;                   /* troposphere option: correction off */
-    final int TROPOPT_SAAS = 1;                  /* troposphere option: Saastamoinen model */
-    final int TROPOPT_SBAS = 2;                  /* troposphere option: SBAS model */
-    final int TROPOPT_EST = 3;                   /* troposphere option: ZTD estimation */
-    final int TROPOPT_ESTG = 4;                  /* troposphere option: ZTD+grad estimation */
-    final int TROPOPT_ZTD = 5;                   /* troposphere option: ZTD correction */
+    public static final int TROPOPT_OFF = 0;                   /* troposphere option: correction off */
+    public static final int TROPOPT_SAAS = 1;                  /* troposphere option: Saastamoinen model */
+    public static final int TROPOPT_SBAS = 2;                  /* troposphere option: SBAS model */
+    public static final int TROPOPT_EST = 3;                   /* troposphere option: ZTD estimation */
+    public static final int TROPOPT_ESTG = 4;                  /* troposphere option: ZTD+grad estimation */
+    public static final int TROPOPT_ZTD = 5;                   /* troposphere option: ZTD correction */
 
-    final int EPHOPT_BRDC = 0;                   /* ephemeris option: broadcast ephemeris */
-    final int EPHOPT_PREC = 1;                   /* ephemeris option: precise ephemeris */
-    final int EPHOPT_SBAS = 2;                   /* ephemeris option: broadcast + SBAS */
-    final int EPHOPT_SSRAPC = 3;                 /* ephemeris option: broadcast + SSR_APC */
-    final int EPHOPT_SSRCOM = 4;                 /* ephemeris option: broadcast + SSR_COM */
-    final int EPHOPT_LEX  = 5;                   /* ephemeris option: QZSS LEX ephemeris */
+    public static final int EPHOPT_BRDC = 0;                   /* ephemeris option: broadcast ephemeris */
+    public static final int EPHOPT_PREC = 1;                   /* ephemeris option: precise ephemeris */
+    public static final int EPHOPT_SBAS = 2;                   /* ephemeris option: broadcast + SBAS */
+    public static final int EPHOPT_SSRAPC = 3;                 /* ephemeris option: broadcast + SSR_APC */
+    public static final int EPHOPT_SSRCOM = 4;                 /* ephemeris option: broadcast + SSR_COM */
+    public static final int EPHOPT_LEX  = 5;                   /* ephemeris option: QZSS LEX ephemeris */
 
-    final int ARMODE_OFF  = 0;                   /* AR mode: off */
-    final int ARMODE_CONT = 1;                   /* AR mode: continuous */
-    final int ARMODE_INST = 2;                   /* AR mode: instantaneous */
-    final int ARMODE_FIXHOLD = 3;                /* AR mode: fix and hold */
-    final int ARMODE_WLNL = 4;                   /* AR mode: wide lane/narrow lane */
-    final int ARMODE_TCAR = 5;                   /* AR mode: triple carrier ar */
+    public static final int ARMODE_OFF  = 0;                   /* AR mode: off */
+    public static final int ARMODE_CONT = 1;                   /* AR mode: continuous */
+    public static final int ARMODE_INST = 2;                   /* AR mode: instantaneous */
+    public static final int ARMODE_FIXHOLD = 3;                /* AR mode: fix and hold */
+    public static final int ARMODE_WLNL = 4;                   /* AR mode: wide lane/narrow lane */
+    public static final int ARMODE_TCAR = 5;                   /* AR mode: triple carrier ar */
 
-    final int SBSOPT_LCORR = 1;                  /* SBAS option: long term correction */
-    final int SBSOPT_FCORR = 2;                  /* SBAS option: fast correction */
-    final int SBSOPT_ICORR = 4;                  /* SBAS option: ionosphere correction */
-    final int SBSOPT_RANGE = 8;                  /* SBAS option: ranging */
+    public static final int SBSOPT_LCORR = 1;                  /* SBAS option: long term correction */
+    public static final int SBSOPT_FCORR = 2;                  /* SBAS option: fast correction */
+    public static final int SBSOPT_ICORR = 4;                  /* SBAS option: ionosphere correction */
+    public static final int SBSOPT_RANGE = 8;                  /* SBAS option: ranging */
 
-    final int POSOPT_POS   = 0;                  /* pos option: LLH/XYZ */
-    final int POSOPT_SINGLE = 1;                 /* pos option: average of single pos */
-    final int POSOPT_FILE  = 2;                  /* pos option: read from pos file */
-    final int POSOPT_RINEX = 3;                  /* pos option: rinex header pos */
-    final int POSOPT_RTCM  = 4;                  /* pos option: rtcm station pos */
-    final int POSOPT_RAW   = 5;                  /* pos option: raw station pos */
+    public static final int POSOPT_POS   = 0;                  /* pos option: LLH/XYZ */
+    public static final int POSOPT_SINGLE = 1;                 /* pos option: average of single pos */
+    public static final int POSOPT_FILE  = 2;                  /* pos option: read from pos file */
+    public static final int POSOPT_RINEX = 3;                  /* pos option: rinex header pos */
+    public static final int POSOPT_RTCM  = 4;                  /* pos option: rtcm station pos */
+    public static final int POSOPT_RAW   = 5;                  /* pos option: raw station pos */
 
-    final int STR_NONE     = 0;                  /* stream type: none */
-    final int STR_SERIAL   = 1;                  /* stream type: serial */
-    final int STR_FILE     = 2;                  /* stream type: file */
-    final int STR_TCPSVR   = 3;                  /* stream type: TCP server */
-    final int STR_TCPCLI   = 4;                  /* stream type: TCP client */
-    final int STR_NTRIPSVR = 6;                  /* stream type: NTRIP server */
-    final int STR_NTRIPCLI = 7;                  /* stream type: NTRIP client */
-    final int STR_FTP      = 8;                  /* stream type: ftp */
-    final int STR_HTTP     = 9;                  /* stream type: http */
-    final int STR_NTRIPC_S = 10;                 /* stream type: NTRIP caster server */
-    final int STR_NTRIPC_C = 11;                 /* stream type: NTRIP caster client */
-    final int STR_UDPSVR   = 12;                 /* stream type: UDP server */
-    final int STR_UDPCLI   = 13;                 /* stream type: UDP server */
-    final int STR_MEMBUF   = 14;                 /* stream type: memory buffer */
+    public static final int STR_NONE     = 0;                  /* stream type: none */
+    public static final int STR_SERIAL   = 1;                  /* stream type: serial */
+    public static final int STR_FILE     = 2;                  /* stream type: file */
+    public static final int STR_TCPSVR   = 3;                  /* stream type: TCP server */
+    public static final int STR_TCPCLI   = 4;                  /* stream type: TCP client */
+    public static final int STR_NTRIPSVR = 6;                  /* stream type: NTRIP server */
+    public static final int STR_NTRIPCLI = 7;                  /* stream type: NTRIP client */
+    public static final int STR_FTP      = 8;                  /* stream type: ftp */
+    public static final int STR_HTTP     = 9;                  /* stream type: http */
+    public static final int STR_NTRIPC_S = 10;                 /* stream type: NTRIP caster server */
+    public static final int STR_NTRIPC_C = 11;                 /* stream type: NTRIP caster client */
+    public static final int STR_UDPSVR   = 12;                 /* stream type: UDP server */
+    public static final int STR_UDPCLI   = 13;                 /* stream type: UDP server */
+    public static final int STR_MEMBUF   = 14;                 /* stream type: memory buffer */
 
-    final int STRFMT_RTCM2 = 0;                  /* stream format: RTCM 2 */
-    final int STRFMT_RTCM3 = 1;                  /* stream format: RTCM 3 */
-    final int STRFMT_OEM4  = 2;                  /* stream format: NovAtel OEMV/4 */
-    final int STRFMT_OEM3  = 3;                  /* stream format: NovAtel OEM3 */
-    final int STRFMT_UBX   = 4;                  /* stream format: u-blox LEA-*T */
-    final int STRFMT_SS2   = 5;                  /* stream format: NovAtel Superstar II */
-    final int STRFMT_CRES  = 6;                  /* stream format: Hemisphere */
-    final int STRFMT_STQ   = 7;                  /* stream format: SkyTraq S1315F */
-    final int STRFMT_GW10  = 8;                  /* stream format: Furuno GW10 */
-    final int STRFMT_JAVAD = 9;                  /* stream format: JAVAD GRIL/GREIS */
-    final int STRFMT_NVS   = 10;                 /* stream format: NVS NVC08C */
-    final int STRFMT_BINEX = 11;                 /* stream format: BINEX */
-    final int STRFMT_RT17  = 12;                 /* stream format: Trimble RT17 */
-    final int STRFMT_SEPT  = 13;                 /* stream format: Septentrio */
-    final int STRFMT_CMR   = 14;                 /* stream format: CMR/CMR+ */
-    final int STRFMT_TERSUS = 15;                /* stream format: TERSUS */
-    final int STRFMT_LEXR  = 16;                 /* stream format: Furuno LPY-10000 */
-    final int STRFMT_RINEX = 17;                 /* stream format: RINEX */
-    final int STRFMT_SP3   = 18;                 /* stream format: SP3 */
-    final int STRFMT_RNXCLK = 19;                /* stream format: RINEX CLK */
-    final int STRFMT_SBAS  = 20;                 /* stream format: SBAS messages */
-    final int STRFMT_NMEA  = 21;                 /* stream format: NMEA 0183 */
-    final int MAXRCVFMT    = 15;                 /* max number of receiver format */
+    public static final int STRFMT_RTCM2 = 0;                  /* stream format: RTCM 2 */
+    public static final int STRFMT_RTCM3 = 1;                  /* stream format: RTCM 3 */
+    public static final int STRFMT_OEM4  = 2;                  /* stream format: NovAtel OEMV/4 */
+    public static final int STRFMT_OEM3  = 3;                  /* stream format: NovAtel OEM3 */
+    public static final int STRFMT_UBX   = 4;                  /* stream format: u-blox LEA-*T */
+    public static final int STRFMT_SS2   = 5;                  /* stream format: NovAtel Superstar II */
+    public static final int STRFMT_CRES  = 6;                  /* stream format: Hemisphere */
+    public static final int STRFMT_STQ   = 7;                  /* stream format: SkyTraq S1315F */
+    public static final int STRFMT_GW10  = 8;                  /* stream format: Furuno GW10 */
+    public static final int STRFMT_JAVAD = 9;                  /* stream format: JAVAD GRIL/GREIS */
+    public static final int STRFMT_NVS   = 10;                 /* stream format: NVS NVC08C */
+    public static final int STRFMT_BINEX = 11;                 /* stream format: BINEX */
+    public static final int STRFMT_RT17  = 12;                 /* stream format: Trimble RT17 */
+    public static final int STRFMT_SEPT  = 13;                 /* stream format: Septentrio */
+    public static final int STRFMT_CMR   = 14;                 /* stream format: CMR/CMR+ */
+    public static final int STRFMT_TERSUS = 15;                /* stream format: TERSUS */
+    public static final int STRFMT_LEXR  = 16;                 /* stream format: Furuno LPY-10000 */
+    public static final int STRFMT_RINEX = 17;                 /* stream format: RINEX */
+    public static final int STRFMT_SP3   = 18;                 /* stream format: SP3 */
+    public static final int STRFMT_RNXCLK = 19;                /* stream format: RINEX CLK */
+    public static final int STRFMT_SBAS  = 20;                 /* stream format: SBAS messages */
+    public static final int STRFMT_NMEA  = 21;                 /* stream format: NMEA 0183 */
+    public static final int MAXRCVFMT    = 15;                 /* max number of receiver format */
 
-    final int STR_MODE_R  = 0x1;                 /* stream mode: read */
-    final int STR_MODE_W  = 0x2;                 /* stream mode: write */
-    final int STR_MODE_RW = 0x3;                 /* stream mode: read/write */
+    public static final int STR_MODE_R  = 0x1;                 /* stream mode: read */
+    public static final int STR_MODE_W  = 0x2;                 /* stream mode: write */
+    public static final int STR_MODE_RW = 0x3;                 /* stream mode: read/write */
 
-    final int GEOID_EMBEDDED    = 0;             /* geoid model: embedded geoid */
-    final int GEOID_EGM96_M150  = 1;             /* geoid model: EGM96 15x15" */
-    final int GEOID_EGM2008_M25 = 2;             /* geoid model: EGM2008 2.5x2.5" */
-    final int GEOID_EGM2008_M10 = 3;             /* geoid model: EGM2008 1.0x1.0" */
-    final int GEOID_GSI2000_M15 = 4;             /* geoid model: GSI geoid 2000 1.0x1.5" */
-    final int GEOID_RAF09       = 5;             /* geoid model: IGN RAF09 for France 1.5"x2" */
+    public static final int GEOID_EMBEDDED    = 0;             /* geoid model: embedded geoid */
+    public static final int GEOID_EGM96_M150  = 1;             /* geoid model: EGM96 15x15" */
+    public static final int GEOID_EGM2008_M25 = 2;             /* geoid model: EGM2008 2.5x2.5" */
+    public static final int GEOID_EGM2008_M10 = 3;             /* geoid model: EGM2008 1.0x1.0" */
+    public static final int GEOID_GSI2000_M15 = 4;             /* geoid model: GSI geoid 2000 1.0x1.5" */
+    public static final int GEOID_RAF09       = 5;             /* geoid model: IGN RAF09 for France 1.5"x2" */
 
-    final String COMMENTH    = "%";                 /* comment line indicator for solution */
-    final String MSG_DISCONN = "$_DISCONNECT\r\n";  /* disconnect message */
+    public static final String COMMENTH    = "%";                 /* comment line indicator for solution */
+    public static final String MSG_DISCONN = "$_DISCONNECT\r\n";  /* disconnect message */
 
-    final int DLOPT_FORCE   = 0x01;              /* download option: force download existing */
-    final int DLOPT_KEEPCMP = 0x02;              /* download option: keep compressed file */
-    final int DLOPT_HOLDERR = 0x04;              /* download option: hold on error file */
-    final int DLOPT_HOLDLST = 0x08;              /* download option: hold on listing file */
+    public static final int DLOPT_FORCE   = 0x01;              /* download option: force download existing */
+    public static final int DLOPT_KEEPCMP = 0x02;              /* download option: keep compressed file */
+    public static final int DLOPT_HOLDERR = 0x04;              /* download option: hold on error file */
+    public static final int DLOPT_HOLDLST = 0x08;              /* download option: hold on listing file */
 
-    final int LLI_SLIP    = 0x01;                /* LLI: cycle-slip */
-    final int LLI_HALFC   = 0x02;                /* LLI: half-cycle not resovled */
-    final int LLI_BOCTRK  = 0x04;                /* LLI: boc tracking of mboc signal */
-    final int LLI_HALFA   = 0x40;                /* LLI: half-cycle added */
-    final int LLI_HALFS   = 0x80;                /* LLI: half-cycle subtracted */
+    public static final int LLI_SLIP    = 0x01;                /* LLI: cycle-slip */
+    public static final int LLI_HALFC   = 0x02;                /* LLI: half-cycle not resovled */
+    public static final int LLI_BOCTRK  = 0x04;                /* LLI: boc tracking of mboc signal */
+    public static final int LLI_HALFA   = 0x40;                /* LLI: half-cycle added */
+    public static final int LLI_HALFS   = 0x80;                /* LLI: half-cycle subtracted */
 
-    final int IMUFMT_KVH  = 1;                   /* imu data format KVH */
+    public static final int IMUFMT_KVH  = 1;                   /* imu data format KVH */
 
-    final double P2_5        = 0.03125;             /* 2^-5 */
-    final double P2_6        = 0.015625;            /* 2^-6 */
-    final double P2_11       = 4.882812500000000E-04; /* 2^-11 */
-    final double P2_15       = 3.051757812500000E-05; /* 2^-15 */
-    final double P2_17       = 7.629394531250000E-06; /* 2^-17 */
-    final double P2_19       = 1.907348632812500E-06; /* 2^-19 */
-    final double P2_20       = 9.536743164062500E-07; /* 2^-20 */
-    final double P2_21       = 4.768371582031250E-07; /* 2^-21 */
-    final double P2_23       = 1.192092895507810E-07; /* 2^-23 */
-    final double P2_24       = 5.960464477539063E-08; /* 2^-24 */
-    final double P2_27       = 7.450580596923828E-09;/* 2^-27 */
-    final double P2_29       = 1.862645149230957E-09; /* 2^-29 */
-    final double P2_30       = 9.313225746154785E-10; /* 2^-30 */
-    final double P2_31       = 4.656612873077393E-10; /* 2^-31 */
-    final double P2_32       = 2.328306436538696E-10; /* 2^-32 */
-    final double P2_33       = 1.164153218269348E-10; /* 2^-33 */
-    final double P2_35       = 2.910383045673370E-11; /* 2^-35 */
-    final double P2_38       = 3.637978807091710E-12; /* 2^-38 */
-    final double P2_39       = 1.818989403545856E-12; /* 2^-39 */
-    final double P2_40       = 9.094947017729280E-13; /* 2^-40 */
-    final double P2_43       = 1.136868377216160E-13; /* 2^-43 */
-    final double P2_48       = 3.552713678800501E-15; /* 2^-48 */
-    final double P2_50       = 8.881784197001252E-16; /* 2^-50 */
-    final double P2_55       = 2.775557561562891E-17; /* 2^-55 */
+    public static final double P2_5        = 0.03125;             /* 2^-5 */
+    public static final double P2_6        = 0.015625;            /* 2^-6 */
+    public static final double P2_11       = 4.882812500000000E-04; /* 2^-11 */
+    public static final double P2_15       = 3.051757812500000E-05; /* 2^-15 */
+    public static final double P2_17       = 7.629394531250000E-06; /* 2^-17 */
+    public static final double P2_19       = 1.907348632812500E-06; /* 2^-19 */
+    public static final double P2_20       = 9.536743164062500E-07; /* 2^-20 */
+    public static final double P2_21       = 4.768371582031250E-07; /* 2^-21 */
+    public static final double P2_23       = 1.192092895507810E-07; /* 2^-23 */
+    public static final double P2_24       = 5.960464477539063E-08; /* 2^-24 */
+    public static final double P2_27       = 7.450580596923828E-09;/* 2^-27 */
+    public static final double P2_29       = 1.862645149230957E-09; /* 2^-29 */
+    public static final double P2_30       = 9.313225746154785E-10; /* 2^-30 */
+    public static final double P2_31       = 4.656612873077393E-10; /* 2^-31 */
+    public static final double P2_32       = 2.328306436538696E-10; /* 2^-32 */
+    public static final double P2_33       = 1.164153218269348E-10; /* 2^-33 */
+    public static final double P2_35       = 2.910383045673370E-11; /* 2^-35 */
+    public static final double P2_38       = 3.637978807091710E-12; /* 2^-38 */
+    public static final double P2_39       = 1.818989403545856E-12; /* 2^-39 */
+    public static final double P2_40       = 9.094947017729280E-13; /* 2^-40 */
+    public static final double P2_43       = 1.136868377216160E-13; /* 2^-43 */
+    public static final double P2_48       = 3.552713678800501E-15; /* 2^-48 */
+    public static final double P2_50       = 8.881784197001252E-16; /* 2^-50 */
+    public static final double P2_55       = 2.775557561562891E-17; /* 2^-55 */
 
     /* type definitions ----------------------------------------------------------*/
 
-    public class gtime_t {        /* time struct */
+    public static class gtime_t {        /* time struct */
         Instant time;        /* time (s) expressed by standard time_t */
         double sec;         /* fraction of second under 1 s */
     };
@@ -928,12 +928,12 @@ public class rtklib {
         double tint;        /* time interval (s) */
     } ;
 
-    public class opt_t {        /* option type */
-        final String name = new String();   /* option name */
+    public static class opt_t {        /* option type */
+        public static final String name = new String();   /* option name */
         int format;         /* option format (0:int,1:double,2:string,3:enum) */
         // todo: Need to find the type
         // void *var;          /* pointer to option variable */
-        final String comment = new String(); /* option comment/enum labels/unit */
+        public static final String comment = new String(); /* option comment/enum labels/unit */
     } ;
 
     public class exterr_t {        /* extended receiver error model */
