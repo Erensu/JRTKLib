@@ -470,7 +470,7 @@ public class rtklib {
 
     public class erp_t {        /* earth rotation parameter type */
         int n,nmax;         /* number and max number of data */
-        erpd_t data;       /* earth rotation parameter data */
+        List<erpd_t> data = new ArrayList<erpd_t>();       /* earth rotation parameter data */
     } ;
 
     public class pcv_t {        /* antenna parameter type */
