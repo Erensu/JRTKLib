@@ -534,21 +534,21 @@ public class ephemeris {
         if (sys==rtklib.SYS_GPS||sys==rtklib.SYS_GAL||sys==rtklib.SYS_QZS||sys==rtklib.SYS_CMP) {
             if (!(eph=seleph(teph,sat,iode,nav))) return 0;
             eph2pos(time,eph,rs,dts,var);
-            time=timeadd(time,tt);
+            time=rtkcmn.timeadd(time,tt);
             eph2pos(time,eph,rst,dtst,var);
         *svh=eph->svh;
         }
         else if (sys==rtklib.SYS_GLO) {
             if (!(geph=selgeph(teph,sat,iode,nav))) return 0;
             geph2pos(time,geph,rs,dts,var);
-            time=timeadd(time,tt);
+            time=rtkcmn.timeadd(time,tt);
             geph2pos(time,geph,rst,dtst,var);
         *svh=geph->svh;
         }
         else if (sys==rtklib.SYS_SBS) {
             if (!(seph=selseph(teph,sat,nav))) return 0;
             seph2pos(time,seph,rs,dts,var);
-            time=timeadd(time,tt);
+            time=rtkcmn.timeadd(time,tt);
             seph2pos(time,seph,rst,dtst,var);
         *svh=seph->svh;
         }
@@ -589,17 +589,26 @@ public class ephemeris {
         return 0;
     }
     /* satellite position and clock with ssr correction --------------------------*/
-    static int satpos_ssr(rtklib.gtime_t time, rtklib.gtime_t teph, int sat, final rtklib.nav_t nav,
+    public static int satpos_ssr(rtklib.gtime_t time, rtklib.gtime_t teph, int sat, final rtklib.nav_t nav,
                           int opt, double *rs, double *dts, double *var, int *svh)
     {
-    final ssr_t *ssr;
-        eph_t *eph;
-        double t1,t2,t3,er[3],ea[3],ec[3],rc[3],deph[3],dclk,dant[3]={0},tk;
+        final rtklib.ssr_t ssr = new rtklib.ssr_t();
+        rtklib.eph_t eph = new rtklib.eph_t();
+        double t1,t2,t3;
+        double[] er = new double[3];
+        double[] ea = new double[3];
+        double[] ec = new double[3];
+        double[] rc = new double[3];
+        double[] deph = new double[3];
+        double   dclk;
+        double[] dant = new double[3];
+        double tk;
+
         int i,sys;
 
         rtkcmn.trace(4,"satpos_ssr: time=%s sat=%2d\n",rtkcmn.time_str(time,3),sat);
 
-        ssr=nav->ssr+sat-1;
+        ssr=nav.ssr+sat-1;
 
         if (!ssr->t0[0].time) {
             rtkcmn.trace(2,"no ssr orbit correction: %s sat=%2d\n",rtkcmn.time_str(time,0),sat);
@@ -616,9 +625,9 @@ public class ephemeris {
         *svh=-1;
             return 0;
         }
-        t1=rtkcmn.timediff(time,ssr->t0[0]);
-        t2=rtkcmn.timediff(time,ssr->t0[1]);
-        t3=rtkcmn.timediff(time,ssr->t0[2]);
+        t1=rtkcmn.timediff(time,ssr.t0[0]);
+        t2=rtkcmn.timediff(time,ssr.t0[1]);
+        t3=rtkcmn.timediff(time,ssr.t0[2]);
 
         /* ssr orbit and clock correction (ref [4]) */
         if (Math.abs(t1)>MAXAGESSR||Math.abs(t2)>MAXAGESSR) {
@@ -666,11 +675,11 @@ public class ephemeris {
         *svh=-1;
             return 0;
         }
-        cross3(ea,ec,er);
+        rtkcmn.cross3(ea,ec,er);
 
         /* satellite antenna offset correction */
         if (opt) {
-            satantoff(time,rs,sat,nav,dant);
+            rtkcmn.satantoff(time,rs,sat,nav,dant);
         }
         for (i=0;i<3;i++) {
             rs[i]+=-(er[i]*deph[0]+ea[i]*deph[1]+ec[i]*deph[2])+dant[i];

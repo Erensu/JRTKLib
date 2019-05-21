@@ -101,7 +101,7 @@
  *           2014/05/29 1.27 fix bug on obs2code() to search obs code table
  *           2014/08/26 1.28 fix problem on output of uncompress() for tar file
  *                           add function to swap trace file with keywords
- *           2014/10/21 1.29 strtok() -> strtok_r() in expath() for thread-safe
+ *           2014/10/21 1.29 strtok() . strtok_r() in expath() for thread-safe
  *                           add bdsmodear in procopt_default
  *           2015/03/19 1.30 fix bug on interpolation of erp values in geterp()
  *                           add leap second insertion before 2015/07/01 00:00
@@ -115,12 +115,12 @@
  *           2016/06/11 1.35 delete trace() in reppath() to avoid deadlock
  *           2016/07/01 1.36 support IRNSS
  *                           add leap second before 2017/1/1 00:00:00
- *           2016/07/29 1.37 rename api compress() -> rtk_uncompress()
- *                           rename api crc16()    -> rtk_crc16()
- *                           rename api crc24q()   -> rtk_crc24q()
- *                           rename api crc32()    -> rtk_crc32()
+ *           2016/07/29 1.37 rename api compress() . rtk_uncompress()
+ *                           rename api crc16()    . rtk_crc16()
+ *                           rename api crc24q()   . rtk_crc24q()
+ *                           rename api crc32()    . rtk_crc32()
  *           2016/08/20 1.38 fix type incompatibility in win64 environment
- *                           change constant _POSIX_C_SOURCE 199309 -> 199506
+ *                           change constant _POSIX_C_SOURCE 199309 . 199506
  *           2016/08/21 1.39 fix bug on week overflow in time2gpst()/gpst2time()
  *           2016/09/05 1.40 fix bug on invalid nav data read in readnav()
  *           2016/09/17 1.41 suppress warnings
@@ -1098,7 +1098,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * notes  : see reference [4] 5.2
      *          matirix stored by column-major order (fortran convention)
      *-----------------------------------------------------------------------------*/
-    public static int smoother(final double *xf, final double *Qf, final double *xb,
+    public static int smoother(final double[] xf, final double[] Qf, final double *xb,
                     final double *Qb, int n, double *xs, double *Qs)
     {
         double *invQf=mat(n,n),*invQb=mat(n,n),*xx=mat(n,1);
@@ -1233,7 +1233,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static gtime_t gpst2time(int week, double sec)
     {
-        gtime_t t=epoch2time(gpst0);
+        rtklib.gtime_t t=epoch2time(gpst0);
 
         if (sec<-1E9||1E9<sec) sec=0.0;
         t.time+=(time_t)86400*7*week+(int)sec;
@@ -1248,7 +1248,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static double time2gpst(gtime_t t, int *week)
     {
-        gtime_t t0=epoch2time(gpst0);
+        rtklib.gtime_t t0=epoch2time(gpst0);
         time_t sec=t.time-t0.time;
         int w=(int)(sec/(86400*7));
 
@@ -1261,9 +1261,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double sec       I   time of week in gst (s)
      * return : gtime_t struct
      *-----------------------------------------------------------------------------*/
-    public static gtime_t gst2time(int week, double sec)
+    public static rtklib.gtime_t gst2time(int week, double sec)
     {
-        gtime_t t=epoch2time(gst0);
+        rtklib.gtime_t t=epoch2time(gst0);
 
         if (sec<-1E9||1E9<sec) sec=0.0;
         t.time+=(time_t)86400*7*week+(int)sec;
@@ -1276,9 +1276,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          int    *week     IO  week number in gst (NULL: no output)
      * return : time of week in gst (s)
      *-----------------------------------------------------------------------------*/
-    public static double time2gst(gtime_t t, int *week)
+    public static double time2gst(rtklib.gtime_t t, int *week)
     {
-        gtime_t t0=epoch2time(gst0);
+        rtklib.gtime_t t0=epoch2time(gst0);
         time_t sec=t.time-t0.time;
         int w=(int)(sec/(86400*7));
 
@@ -1291,9 +1291,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double sec       I   time of week in bdt (s)
      * return : gtime_t struct
      *-----------------------------------------------------------------------------*/
-    public static gtime_t bdt2time(int week, double sec)
+    public static rtklib.gtime_t bdt2time(int week, double sec)
     {
-        gtime_t t=epoch2time(bdt0);
+        rtklib.gtime_t t=epoch2time(bdt0);
 
         if (sec<-1E9||1E9<sec) sec=0.0;
         t.time+=(time_t)86400*7*week+(int)sec;
@@ -1306,9 +1306,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          int    *week     IO  week number in bdt (NULL: no output)
      * return : time of week in bdt (s)
      *-----------------------------------------------------------------------------*/
-    public static double time2bdt(gtime_t t, int *week)
+    public static double time2bdt(rtklib.gtime_t t, int *week)
     {
-        gtime_t t0=epoch2time(bdt0);
+        rtklib.gtime_t t0=epoch2time(bdt0);
         time_t sec=t.time-t0.time;
         int w=(int)(sec/(86400*7));
 
@@ -1321,11 +1321,11 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double sec       I   time to add (s)
      * return : gtime_t struct (t+sec)
      *-----------------------------------------------------------------------------*/
-    public static gtime_t timeadd(gtime_t t, double sec)
+    public static rtklib.gtime_t timeadd(rtklib.gtime_t t, double sec)
     {
         double tt;
 
-        t.sec+=sec; tt=floor(t.sec); t.time+=(int)tt; t.sec-=tt;
+        t.sec+=sec; tt=Math.floor(t.sec); t.time+=(int)tt; t.sec-=tt;
         return t;
     }
     /* time difference -------------------------------------------------------------
@@ -1333,7 +1333,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * args   : gtime_t t1,t2    I   gtime_t structs
      * return : time difference (t1-t2) (s)
      *-----------------------------------------------------------------------------*/
-    public static double timediff(gtime_t t1, gtime_t t2)
+    public static double timediff(rtklib.gtime_t t1, rtklib.gtime_t t2)
     {
         return difftime(t1.time,t2.time)+t1.sec-t2.sec;
     }
@@ -1344,9 +1344,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     static double timeoffset_=0.0;        /* time offset (s) */
 
-    public static gtime_t timeget(void)
+    public static rtklib.gtime_t timeget(void)
     {
-        gtime_t time;
+        rtklib.gtime_t time;
         double ep[6]={0};
 #ifdef WIN32
         SYSTEMTIME ts;
@@ -1359,8 +1359,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         struct tm *tt;
 
         if (!gettimeofday(&tv,NULL)&&(tt=gmtime(&tv.tv_sec))) {
-        ep[0]=tt->tm_year+1900; ep[1]=tt->tm_mon+1; ep[2]=tt->tm_mday;
-        ep[3]=tt->tm_hour; ep[4]=tt->tm_min; ep[5]=tt->tm_sec+tv.tv_usec*1E-6;
+        ep[0]=tt.tm_year+1900; ep[1]=tt.tm_mon+1; ep[2]=tt.tm_mday;
+        ep[3]=tt.tm_hour; ep[4]=tt.tm_min; ep[5]=tt.tm_sec+tv.tv_usec*1E-6;
     }
 #endif
             time=epoch2time(ep);
@@ -1378,12 +1378,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          the time offset is reflected to only timeget()
      *          not reentrant
      *-----------------------------------------------------------------------------*/
-    public static void timeset(gtime_t t)
+    public static void timeset(rtklib.gtime_t t)
     {
         timeoffset_+=timediff(t,timeget());
     }
     /* read leap seconds table by text -------------------------------------------*/
-    static int read_leaps_text(FILE *fp)
+    static int read_leaps_text(File fp)
     {
         char buff[256],*p;
         int i,n=0,ep[6],ls;
@@ -1400,7 +1400,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         return n;
     }
     /* read leap seconds table by usno -------------------------------------------*/
-    static int read_leaps_usno(FILE *fp)
+    static int read_leaps_usno(File *fp)
     {
         static final char *months[]={
         "JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"
@@ -1438,9 +1438,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          (2) The date and time indicate the start UTC time for the UTC-GPST
      *          (3) The date and time should be descending order.
      *-----------------------------------------------------------------------------*/
-    public static int read_leaps(final char *file)
+    public static int read_leaps(final char file)
     {
-        FILE *fp;
+        File fp;
         int i,n;
 
         if (!(fp=fopen(file,"r"))) return 0;
@@ -1460,9 +1460,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : time expressed in utc
      * notes  : ignore slight time offset under 100 ns
      *-----------------------------------------------------------------------------*/
-    public static gtime_t gpst2utc(gtime_t t)
+    public static rtklib.gtime_t gpst2utc(rtklib.gtime_t t)
     {
-        gtime_t tu;
+        rtklib.gtime_t tu;
         int i;
 
         for (i=0;leaps[i][0]>0;i++) {
@@ -1477,7 +1477,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : time expressed in gpstime
      * notes  : ignore slight time offset under 100 ns
      *-----------------------------------------------------------------------------*/
-    public static gtime_t utc2gpst(gtime_t t)
+    public static rtklib.gtime_t utc2gpst(rtklib.gtime_t t)
     {
         int i;
 
@@ -1494,7 +1494,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          no leap seconds in BDT
      *          ignore slight time offset under 100 ns
      *-----------------------------------------------------------------------------*/
-    public static gtime_t gpst2bdt(gtime_t t)
+    public static rtklib.gtime_t gpst2bdt(rtklib.gtime_t t)
     {
         return timeadd(t,-14.0);
     }
@@ -1504,12 +1504,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : time expressed in gpstime
      * notes  : see gpst2bdt()
      *-----------------------------------------------------------------------------*/
-    public static gtime_t bdt2gpst(gtime_t t)
+    public static rtklib.gtime_t bdt2gpst(rtklib.gtime_t t)
     {
         return timeadd(t,14.0);
     }
     /* time to day and sec -------------------------------------------------------*/
-    static double time2sec(gtime_t time, gtime_t *day)
+    static double time2sec(rtklib.gtime_t time, rtklib.gtime_t *day)
     {
         double ep[6],sec;
         time2epoch(time,ep);
@@ -1524,10 +1524,10 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double ut1_utc   I   UT1-UTC (s)
      * return : gmst (rad)
      *-----------------------------------------------------------------------------*/
-    public static double utc2gmst(gtime_t t, double ut1_utc)
+    public static double utc2gmst(rtklib.gtime_t t, double ut1_utc)
     {
-    final double ep2000[]={2000,1,1,12,0,0};
-        gtime_t tut,tut0;
+        final double ep2000[]={2000,1,1,12,0,0};
+        rtklib.gtime_t tut,tut0;
         double ut,t1,t2,t3,gmst0,gmst;
 
         tut=timeadd(t,ut1_utc);
@@ -1537,7 +1537,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         gmst0=24110.54841+8640184.812866*t1+0.093104*t2-6.2E-6*t3;
         gmst=gmst0+1.002737909350795*ut;
 
-        return fmod(gmst,86400.0)*PI/43200.0; /* 0 <= gmst <= 2*PI */
+        return fmod(gmst,86400.0)*rtklib.PI/43200.0; /* 0 <= gmst <= 2*PI */
     }
     /* time to string --------------------------------------------------------------
      * convert gtime_t struct to string
@@ -1546,12 +1546,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          int    n         I   number of decimals
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void time2str(gtime_t t, char *s, int n)
+    public static void time2str(rtklib.gtime_t t, char *s, int n)
     {
         double ep[6];
 
         if (n<0) n=0; else if (n>12) n=12;
-        if (1.0-t.sec<0.5/pow(10.0,n)) {t.time++; t.sec=0.0;};
+        if (1.0-t.sec<0.5/Math.pow(10.0,n)) {t.time++; t.sec=0.0;};
         time2epoch(t,ep);
         sprintf(s,"%04.0f/%02.0f/%02.0f %02.0f:%02.0f:%0*.*f",ep[0],ep[1],ep[2],
                 ep[3],ep[4],n<=0?2:n+3,n<=0?0:n,ep[5]);
@@ -1574,7 +1574,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * args   : gtime_t t        I   gtime_t struct
      * return : day of year (days)
      *-----------------------------------------------------------------------------*/
-    public static double time2doy(gtime_t t)
+    public static double time2doy(rtklib.gtime_t t)
     {
         double ep[6];
 
@@ -1599,7 +1599,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * args   : none
      * return : current tick in ms
      *-----------------------------------------------------------------------------*/
-    public static unsigned int tickget(void)
+    public static long tickget(void)
     {
 #ifdef WIN32
         return (unsigned int)timeGetTime();
@@ -1649,10 +1649,10 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static void deg2dms(double deg, double *dms, int ndec)
     {
         double sign=deg<0.0?-1.0:1.0,a=fabs(deg);
-        double unit=pow(0.1,ndec);
-        dms[0]=floor(a); a=(a-dms[0])*60.0;
-        dms[1]=floor(a); a=(a-dms[1])*60.0;
-        dms[2]=floor(a/unit+0.5)*unit;
+        double unit=Math.pow(0.1,ndec);
+        dms[0]=Math.floor(a); a=(a-dms[0])*60.0;
+        dms[1]=Math.floor(a); a=(a-dms[1])*60.0;
+        dms[2]=Math.floor(a/unit+0.5)*unit;
         if (dms[2]>=60.0) {
             dms[2]=0.0;
             dms[1]+=1.0;
@@ -1671,7 +1671,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static double dms2deg(final double *dms)
     {
         double sign=dms[0]<0.0?-1.0:1.0;
-        return sign*(fabs(dms[0])+dms[1]/60.0+dms[2]/3600.0);
+        return sign*(Math.abs(dms[0])+dms[1]/60.0+dms[2]/3600.0);
     }
     /* transform ecef to geodetic postion ------------------------------------------
      * transform ecef position to geodetic position
@@ -1682,17 +1682,17 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void ecef2pos(final double *r, double *pos)
     {
-        double e2=FE_WGS84*(2.0-FE_WGS84),r2=dot(r,r,2),z,zk,v=RE_WGS84,sinp;
+        double e2=rtklib.FE_WGS84*(2.0-rtklib.FE_WGS84),r2=dot(r,r,2),z,zk,v=rtklib.RE_WGS84,sinp;
 
         for (z=r[2],zk=0.0;fabs(z-zk)>=1E-4;) {
             zk=z;
             sinp=z/sqrt(r2+z*z);
-            v=RE_WGS84/sqrt(1.0-e2*sinp*sinp);
+            v=rtklib.RE_WGS84/sqrt(1.0-e2*sinp*sinp);
             z=r[2]+v*e2*sinp;
         }
-        pos[0]=r2>1E-12?atan(z/sqrt(r2)):(r[2]>0.0?PI/2.0:-PI/2.0);
+        pos[0]=r2>1E-12?atan(z/sqrt(r2)):(r[2]>0.0?rtklib.PI/2.0:-rtklib.PI/2.0);
         pos[1]=r2>1E-12?atan2(r[1],r[0]):0.0;
-        pos[2]=sqrt(r2+z*z)-v;
+        pos[2]=Math.sqrt(r2+z*z)-v;
     }
     /* transform geodetic to ecef position -----------------------------------------
      * transform geodetic position to ecef position
@@ -1704,7 +1704,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static void pos2ecef(final double *pos, double *r)
     {
         double sinp=Math.sin(pos[0]),cosp=Math.cos(pos[0]),sinl=Math.sin(pos[1]),cosl=Math.cos(pos[1]);
-        double e2=FE_WGS84*(2.0-FE_WGS84),v=RE_WGS84/sqrt(1.0-e2*sinp*sinp);
+        double e2=rtklib.FE_WGS84*(2.0-rtklib.FE_WGS84),v=rtklib.RE_WGS84/Math.sqrt(1.0-e2*sinp*sinp);
 
         r[0]=(v+pos[2])*cosp*cosl;
         r[1]=(v+pos[2])*cosp*sinl;
@@ -1941,7 +1941,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         *dpsi+=(nut[i][6]+nut[i][7]*t)*sin(ang);
         *deps+=(nut[i][8]+nut[i][9]*t)*cos(ang);
         }
-    *dpsi*=1E-4*AS2R; /* 0.1 mas -> rad */
+    *dpsi*=1E-4*AS2R; /* 0.1 mas . rad */
     *deps*=1E-4*AS2R;
     }
     /* eci to ecef transformation matrix -------------------------------------------
@@ -1955,7 +1955,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * note   : see ref [3] chap 5
      *          not thread-safe
      *-----------------------------------------------------------------------------*/
-    public static void eci2ecef(rtklib.gtime_t tutc, final double *erpv, double *U, double *gmst)
+    public static void eci2ecef(rtklib.gtime_t tutc, final double[] erpv, Double U, Double gmst)
     {
     final double ep2000[]={2000,1,1,12,0,0};
         static gtime_t tutc_;
@@ -2036,19 +2036,19 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         if (pcvs.nmax<=pcvs.n) {
             pcvs.nmax+=256;
-            if (!(pcvs_pcv=(pcv_t *)realloc(pcvs->pcv,sizeof(pcv_t)*pcvs->nmax))) {
+            if (!(pcvs_pcv=(pcv_t *)realloc(pcvs.pcv,sizeof(pcv_t)*pcvs.nmax))) {
                 trace(1,"addpcv: memory allocation error\n");
-                free(pcvs->pcv); pcvs->pcv=null; pcvs.n=pcvs.nmax=0;
+                free(pcvs.pcv); pcvs.pcv=null; pcvs.n=pcvs.nmax=0;
                 return;
             }
-            pcvs->pcv=pcvs_pcv;
+            pcvs.pcv=pcvs_pcv;
         }
-        pcvs->pcv[pcvs->n++]=*pcv;
+        pcvs.pcv[pcvs.n++]=*pcv;
     }
     /* read ngs antenna parameter file -------------------------------------------*/
     static int readngspcv(final String file, rtklib.pcvs_t pcvs)
     {
-        FILE *fp;
+        File *fp;
         static final pcv_t pcv0={0};
         pcv_t pcv;
         double neu[3];
@@ -2096,11 +2096,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     static int readantex(final String file, rtklib.pcvs_t pcvs)
     {
         File fp = new File();
-        static final rtklib.pcv_t pcv0 = new rtklib.pcv_t;
-        rtklib.pcv_t pcv;
-        double neu[3];
-        int i,f,freq=0,state=0,freqs[]={1,2,5,6,7,8,0};
-        char buff[256];
+        final rtklib.pcv_t pcv0 = new rtklib.pcv_t();
+        rtklib.pcv_t pcv = new rtklib.pcv_t();;
+        double[] neu = new double[3];
+        int i,f,freq=0,state;
+        int[] freqs = new int[]{1,2,5,6,7,8,0};
+        char[] buff = new char[256];
 
         trace(3,"readantex: file=%s\n",file);
 
@@ -2186,11 +2187,11 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         else {
             stat=readngspcv(file,pcvs);
         }
-        for (i=0;i<pcvs->n;i++) {
-            pcv=pcvs->pcv+i;
+        for (i=0;i<pcvs.n;i++) {
+            pcv=pcvs.pcv+i;
             trace(4,"sat=%2d type=%20s code=%s off=%8.4f %8.4f %8.4f  %8.4f %8.4f %8.4f\n",
-                    pcv->sat,pcv->type,pcv->code,pcv->off[0][0],pcv->off[0][1],
-                    pcv->off[0][2],pcv->off[1][0],pcv->off[1][1],pcv->off[1][2]);
+                    pcv.sat,pcv.type,pcv.code,pcv.off[0][0],pcv.off[0][1],
+                    pcv.off[0][2],pcv.off[1][0],pcv.off[1][1],pcv.off[1][2]);
         }
         return stat;
     }
@@ -2205,18 +2206,20 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static rtklib.pcv_t searchpcv(int sat, final String type, rtklib.gtime_t time,
                         final rtklib.pcvs_t pcvs)
     {
-        rtklib.pcv_t *pcv;
-        char buff[rtklib.MAXANT],*types[2],*p;
+        rtklib.pcv_t pcv = new rtklib.pcv_t();
+        char[] buff = new char[rtklib.MAXANT];
+        char[] types = new char[2];
+        char[] p = new char[];
         int i,j,n=0;
 
         trace(3,"searchpcv: sat=%2d type=%s\n",sat,type);
 
         if (sat) { /* search satellite antenna */
-            for (i=0;i<pcvs->n;i++) {
-                pcv=pcvs->pcv+i;
-                if (pcv->sat!=sat) continue;
-                if (pcv->ts.time!=0&&timediff(pcv->ts,time)>0.0) continue;
-                if (pcv->te.time!=0&&timediff(pcv->te,time)<0.0) continue;
+            for (i=0;i<pcvs.n;i++) {
+                pcv=pcvs.pcv+i;
+                if (pcv.sat!=sat) continue;
+                if (pcv.ts.time!=0&&timediff(pcv.ts,time)>0.0) continue;
+                if (pcv.te.time!=0&&timediff(pcv.te,time)<0.0) continue;
                 return pcv;
             }
         }
@@ -2226,21 +2229,21 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             if (n<=0) return NULL;
 
             /* search receiver antenna with radome at first */
-            for (i=0;i<pcvs->n;i++) {
-                pcv=pcvs->pcv+i;
-                for (j=0;j<n;j++) if (!strstr(pcv->type,types[j])) break;
+            for (i=0;i<pcvs.n;i++) {
+                pcv=pcvs.pcv+i;
+                for (j=0;j<n;j++) if (!strstr(pcv.type,types[j])) break;
                 if (j>=n) return pcv;
             }
             /* search receiver antenna without radome */
-            for (i=0;i<pcvs->n;i++) {
-                pcv=pcvs->pcv+i;
-                if (strstr(pcv->type,types[0])!=pcv->type) continue;
+            for (i=0;i<pcvs.n;i++) {
+                pcv=pcvs.pcv+i;
+                if (strstr(pcv.type,types[0])!=pcv.type) continue;
 
                 trace(2,"pcv without radome is used type=%s\n",type);
                 return pcv;
             }
         }
-        return NULL;
+        return null;
     }
     /* read station positions ------------------------------------------------------
      * read positions from station position file
@@ -2255,7 +2258,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     {
         static double poss[2048][3];
         static char stas[2048][16];
-        FILE *fp;
+        File *fp;
         int i,j,len,np=0;
         char buff[256],str[256];
 
@@ -2282,7 +2285,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         pos[0]=pos[1]=pos[2]=0.0;
     }
     /* read blq record -----------------------------------------------------------*/
-    static int readblqrecord(FILE *fp, double *odisp)
+    static int readblqrecord(File *fp, double *odisp)
     {
         double v[11];
         char buff[256];
@@ -2306,7 +2309,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static int readblq(final char *file, final char *sta, double *odisp)
     {
-        FILE *fp;
+        File *fp;
         char buff[256],staname[32]="",name[32],*p;
 
         /* station name to upper case */
@@ -2340,9 +2343,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          erp_t  *erp        O   earth rotation parameters
      * return : status (1:ok,0:file open error)
      *-----------------------------------------------------------------------------*/
-    public static int readerp(final char *file, erp_t *erp)
+    public static int readerp(final char *file, rtklib.erp_t erp)
     {
-        FILE *fp;
+        File *fp;
         erpd_t *erp_data;
         double v[14]={0};
         char buff[256];
@@ -2358,23 +2361,23 @@ final String[] formatstrs = new String[]{    /* stream format strings */
                     v,v+1,v+2,v+3,v+4,v+5,v+6,v+7,v+8,v+9,v+10,v+11,v+12,v+13)<5) {
                 continue;
             }
-            if (erp->n>=erp->nmax) {
-                erp->nmax=erp->nmax<=0?128:erp->nmax*2;
-                erp_data=(erpd_t *)realloc(erp->data,sizeof(erpd_t)*erp->nmax);
+            if (erp.n>=erp.nmax) {
+                erp.nmax=erp.nmax<=0?128:erp.nmax*2;
+                erp_data=(erpd_t *)realloc(erp.data,sizeof(erpd_t)*erp.nmax);
                 if (!erp_data) {
-                    free(erp->data); erp->data=NULL; erp->n=erp->nmax=0;
+                    free(erp.data); erp.data=NULL; erp.n=erp.nmax=0;
                     fclose(fp);
                     return 0;
                 }
-                erp->data=erp_data;
+                erp.data=erp_data;
             }
-            erp->data[erp->n].mjd=v[0];
-            erp->data[erp->n].xp=v[1]*1E-6*AS2R;
-            erp->data[erp->n].yp=v[2]*1E-6*AS2R;
-            erp->data[erp->n].ut1_utc=v[3]*1E-7;
-            erp->data[erp->n].lod=v[4]*1E-7;
-            erp->data[erp->n].xpr=v[12]*1E-6*AS2R;
-            erp->data[erp->n++].ypr=v[13]*1E-6*AS2R;
+            erp.data[erp.n].mjd=v[0];
+            erp.data[erp.n].xp=v[1]*1E-6*AS2R;
+            erp.data[erp.n].yp=v[2]*1E-6*AS2R;
+            erp.data[erp.n].ut1_utc=v[3]*1E-7;
+            erp.data[erp.n].lod=v[4]*1E-7;
+            erp.data[erp.n].xpr=v[12]*1E-6*AS2R;
+            erp.data[erp.n++].ypr=v[13]*1E-6*AS2R;
         }
         fclose(fp);
         return 1;
@@ -2422,59 +2425,59 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             a=0.5;
         }
         else {
-            a=(mjd-erp->data[j].mjd)/(erp->data[j+1].mjd-erp->data[j].mjd);
+            a=(mjd-erp.data.get(j).mjd)/(erp.data.get(j+1).mjd-erp.data.get(j).mjd);
         }
-        erpv[0]=(1.0-a)*erp->data[j].xp     +a*erp->data[j+1].xp;
-        erpv[1]=(1.0-a)*erp->data[j].yp     +a*erp->data[j+1].yp;
-        erpv[2]=(1.0-a)*erp->data[j].ut1_utc+a*erp->data[j+1].ut1_utc;
-        erpv[3]=(1.0-a)*erp->data[j].lod    +a*erp->data[j+1].lod;
+        erpv[0]=(1.0-a)*erp.data.get(j).xp     +a*erp.data.get(j).xp;
+        erpv[1]=(1.0-a)*erp.data.get(j).yp     +a*erp.data.get(j).yp;
+        erpv[2]=(1.0-a)*erp.data.get(j).ut1_utc+a*erp.data.get(j).ut1_utc;
+        erpv[3]=(1.0-a)*erp.data.get(j).lod    +a*erp.data.get(j+1).lod;
         return 1;
     }
     /* compare ephemeris ---------------------------------------------------------*/
     static int cmpeph(final void *p1, final void *p2)
     {
         eph_t *q1=(eph_t *)p1,*q2=(eph_t *)p2;
-        return q1->ttr.time!=q2->ttr.time?(int)(q1->ttr.time-q2->ttr.time):
-                (q1->toe.time!=q2->toe.time?(int)(q1->toe.time-q2->toe.time):
-                        q1->sat-q2->sat);
+        return q1.ttr.time!=q2.ttr.time?(int)(q1.ttr.time-q2.ttr.time):
+                (q1.toe.time!=q2.toe.time?(int)(q1.toe.time-q2.toe.time):
+                        q1.sat-q2.sat);
     }
     /* sort and unique ephemeris -------------------------------------------------*/
-    static void uniqeph(nav_t *nav)
+    static void uniqeph(rtklib.nav_t nav)
     {
-        eph_t *nav_eph;
+        rtklib.eph_t nav_eph = new rtklib.eph_t();
         int i,j;
 
-        trace(3,"uniqeph: n=%d\n",nav->n);
+        trace(3,"uniqeph: n=%d\n",nav.n);
 
-        if (nav->n<=0) return;
+        if (nav.n<=0) return;
 
-        qsort(nav->eph,nav->n,sizeof(eph_t),cmpeph);
+        qsort(nav.eph,nav.n,sizeof(eph_t),cmpeph);
 
-        for (i=1,j=0;i<nav->n;i++) {
-            if (nav->eph[i].sat!=nav->eph[j].sat||
-                    nav->eph[i].iode!=nav->eph[j].iode) {
-                nav->eph[++j]=nav->eph[i];
+        for (i=1,j=0;i<nav.n;i++) {
+            if (nav.eph.get(i).sat!=nav.eph.get(j).sat||
+                    nav.eph.get(i).iode!=nav.eph.get(j).iode) {
+                nav.eph.get(++j)=nav.eph.get(i);
             }
         }
-        nav->n=j+1;
+        nav.n=j+1;
 
-        if (!(nav_eph=(eph_t *)realloc(nav->eph,sizeof(eph_t)*nav->n))) {
-        trace(1,"uniqeph malloc error n=%d\n",nav->n);
-        free(nav->eph); nav->eph=NULL; nav->n=nav->nmax=0;
+        if (!(nav_eph=(eph_t *)realloc(nav.eph,sizeof(eph_t)*nav.n))) {
+        trace(1,"uniqeph malloc error n=%d\n",nav.n);
+        free(nav.eph); nav.eph=NULL; nav.n=nav.nmax=0;
         return;
     }
-        nav->eph=nav_eph;
-        nav->nmax=nav->n;
+        nav.eph=nav_eph;
+        nav.nmax=nav.n;
 
-        trace(4,"uniqeph: n=%d\n",nav->n);
+        trace(4,"uniqeph: n=%d\n",nav.n);
     }
     /* compare glonass ephemeris -------------------------------------------------*/
     static int cmpgeph(final void *p1, final void *p2)
     {
         geph_t *q1=(geph_t *)p1,*q2=(geph_t *)p2;
-        return q1->tof.time!=q2->tof.time?(int)(q1->tof.time-q2->tof.time):
-                (q1->toe.time!=q2->toe.time?(int)(q1->toe.time-q2->toe.time):
-                        q1->sat-q2->sat);
+        return q1.tof.time!=q2.tof.time?(int)(q1.tof.time-q2.tof.time):
+                (q1.toe.time!=q2.toe.time?(int)(q1.toe.time-q2.toe.time):
+                        q1.sat-q2.sat);
     }
     /* sort and unique glonass ephemeris -----------------------------------------*/
     static void uniqgeph(rtklib.nav_t nav)
@@ -2482,38 +2485,38 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         rtklib.geph_t nav_geph;
         int i,j;
 
-        trace(3,"uniqgeph: ng=%d\n",nav->ng);
+        trace(3,"uniqgeph: ng=%d\n",nav.ng);
 
-        if (nav->ng<=0) return;
+        if (nav.ng<=0) return;
 
-        qsort(nav->geph,nav->ng,sizeof(geph_t),cmpgeph);
+        qsort(nav.geph,nav.ng,sizeof(geph_t),cmpgeph);
 
-        for (i=j=0;i<nav->ng;i++) {
-            if (nav->geph[i].sat!=nav->geph[j].sat||
-                    nav->geph[i].toe.time!=nav->geph[j].toe.time||
-                            nav->geph[i].svh!=nav->geph[j].svh) {
-                nav->geph[++j]=nav->geph[i];
+        for (i=j=0;i<nav.ng;i++) {
+            if (nav.geph[i].sat!=nav.geph[j].sat||
+                    nav.geph[i].toe.time!=nav.geph[j].toe.time||
+                            nav.geph[i].svh!=nav.geph[j].svh) {
+                nav.geph[++j]=nav.geph[i];
             }
         }
-        nav->ng=j+1;
+        nav.ng=j+1;
 
-        if (!(nav_geph=(geph_t *)realloc(nav->geph,sizeof(geph_t)*nav->ng))) {
-        trace(1,"uniqgeph malloc error ng=%d\n",nav->ng);
-        free(nav->geph); nav->geph=NULL; nav->ng=nav->ngmax=0;
+        if (!(nav_geph=(geph_t *)realloc(nav.geph,sizeof(geph_t)*nav.ng))) {
+        trace(1,"uniqgeph malloc error ng=%d\n",nav.ng);
+        free(nav.geph); nav.geph=NULL; nav.ng=nav.ngmax=0;
         return;
     }
-        nav->geph=nav_geph;
-        nav->ngmax=nav->ng;
+        nav.geph=nav_geph;
+        nav.ngmax=nav.ng;
 
-        trace(4,"uniqgeph: ng=%d\n",nav->ng);
+        trace(4,"uniqgeph: ng=%d\n",nav.ng);
     }
     /* compare sbas ephemeris ----------------------------------------------------*/
     static int cmpseph(final void *p1, final void *p2)
     {
         seph_t *q1=(seph_t *)p1,*q2=(seph_t *)p2;
-        return q1->tof.time!=q2->tof.time?(int)(q1->tof.time-q2->tof.time):
-                (q1->t0.time!=q2->t0.time?(int)(q1->t0.time-q2->t0.time):
-                        q1->sat-q2->sat);
+        return q1.tof.time!=q2.tof.time?(int)(q1.tof.time-q2.tof.time):
+                (q1.t0.time!=q2.t0.time?(int)(q1.t0.time-q2.t0.time):
+                        q1.sat-q2.sat);
     }
     /* sort and unique sbas ephemeris --------------------------------------------*/
     static void uniqseph(nav_t *nav)
@@ -2521,29 +2524,29 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         seph_t *nav_seph;
         int i,j;
 
-        trace(3,"uniqseph: ns=%d\n",nav->ns);
+        trace(3,"uniqseph: ns=%d\n",nav.ns);
 
-        if (nav->ns<=0) return;
+        if (nav.ns<=0) return;
 
-        qsort(nav->seph,nav->ns,sizeof(seph_t),cmpseph);
+        qsort(nav.seph,nav.ns,sizeof(seph_t),cmpseph);
 
-        for (i=j=0;i<nav->ns;i++) {
-            if (nav->seph[i].sat!=nav->seph[j].sat||
-                    nav->seph[i].t0.time!=nav->seph[j].t0.time) {
-                nav->seph[++j]=nav->seph[i];
+        for (i=j=0;i<nav.ns;i++) {
+            if (nav.seph[i].sat!=nav.seph[j].sat||
+                    nav.seph[i].t0.time!=nav.seph[j].t0.time) {
+                nav.seph[++j]=nav.seph[i];
             }
         }
-        nav->ns=j+1;
+        nav.ns=j+1;
 
-        if (!(nav_seph=(seph_t *)realloc(nav->seph,sizeof(seph_t)*nav->ns))) {
-        trace(1,"uniqseph malloc error ns=%d\n",nav->ns);
-        free(nav->seph); nav->seph=NULL; nav->ns=nav->nsmax=0;
+        if (!(nav_seph=(seph_t *)realloc(nav.seph,sizeof(seph_t)*nav.ns))) {
+        trace(1,"uniqseph malloc error ns=%d\n",nav.ns);
+        free(nav.seph); nav.seph=NULL; nav.ns=nav.nsmax=0;
         return;
     }
-        nav->seph=nav_seph;
-        nav->nsmax=nav->ns;
+        nav.seph=nav_seph;
+        nav.nsmax=nav.ns;
 
-        trace(4,"uniqseph: ns=%d\n",nav->ns);
+        trace(4,"uniqseph: ns=%d\n",nav.ns);
     }
     /* unique ephemerides ----------------------------------------------------------
      * unique ephemerides in navigation data and update carrier wave length
@@ -2554,7 +2557,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     {
         int i,j;
 
-        trace(3,"uniqnav: neph=%d ngeph=%d nseph=%d\n",nav->n,nav->ng,nav->ns);
+        trace(3,"uniqnav: neph=%d ngeph=%d nseph=%d\n",nav.n,nav.ng,nav.ns);
 
         /* unique ephemeris */
         uniqeph (nav);
@@ -2563,46 +2566,46 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         /* update carrier wave length */
         for (i=0;i<rtklib.MAXSAT;i++) for (j=0;j<NFREQ;j++) {
-            nav->lam[i][j]=satwavelen(i+1,j,nav);
+            nav.lam[i][j]=satwavelen(i+1,j,nav);
         }
     }
     /* compare observation data -------------------------------------------------*/
     static int cmpobs(final void *p1, final void *p2)
     {
         obsd_t *q1=(obsd_t *)p1,*q2=(obsd_t *)p2;
-        double tt=timediff(q1->time,q2->time);
+        double tt=timediff(q1.time,q2.time);
         if (fabs(tt)>DTTOL) return tt<0?-1:1;
-        if (q1->rcv!=q2->rcv) return (int)q1->rcv-(int)q2->rcv;
-        return (int)q1->sat-(int)q2->sat;
+        if (q1.rcv!=q2.rcv) return (int)q1.rcv-(int)q2.rcv;
+        return (int)q1.sat-(int)q2.sat;
     }
     /* sort and unique observation data --------------------------------------------
      * sort and unique observation data by time, rcv, sat
      * args   : obs_t *obs    IO     observation data
      * return : number of epochs
      *-----------------------------------------------------------------------------*/
-    public static int sortobs(obs_t *obs)
+    public static int sortobs(rtklib.obs_t obs)
     {
         int i,j,n;
 
-        trace(3,"sortobs: nobs=%d\n",obs->n);
+        trace(3,"sortobs: nobs=%d\n",obs.n);
 
-        if (obs->n<=0) return 0;
+        if (obs.n<=0) return 0;
 
-        qsort(obs->data,obs->n,sizeof(obsd_t),cmpobs);
+        qsort(obs.data,obs.n,sizeof(obsd_t),cmpobs);
 
         /* delete duplicated data */
-        for (i=j=0;i<obs->n;i++) {
-            if (obs->data[i].sat!=obs->data[j].sat||
-                    obs->data[i].rcv!=obs->data[j].rcv||
-                            timediff(obs->data[i].time,obs->data[j].time)!=0.0) {
-                obs->data[++j]=obs->data[i];
+        for (i=j=0;i<obs.n;i++) {
+            if (obs.data.get(i).sat!=obs.data.get(j).sat||
+                    obs.data.get(i).rcv!=obs.data.get(j).rcv||
+                            timediff(obs.data.get(i).time,obs.data.get(j).time)!=0.0) {
+                obs.data.set(++j, obs.data.get(i));
             }
         }
-        obs->n=j+1;
+        obs.n=j+1;
 
-        for (i=n=0;i<obs->n;i=j,n++) {
-            for (j=i+1;j<obs->n;j++) {
-                if (timediff(obs->data[j].time,obs->data[i].time)>DTTOL) break;
+        for (i=n=0;i<obs.n;i=j,n++) {
+            for (j=i+1;j<obs.n;j++) {
+                if (timediff(obs.data.get(j).time,obs.data.get(i).time)>rtklib.DTTOL) break;
             }
         }
         return n;
@@ -2615,11 +2618,11 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double  tint  I      time interval (s) (0.0:no screen by tint)
      * return : 1:on condition, 0:not on condition
      *-----------------------------------------------------------------------------*/
-    public static int screent(gtime_t time, gtime_t ts, gtime_t te, double tint)
+    public static int screent(rtklib.gtime_t time, rtklib.gtime_t ts, rtklib.gtime_t te, double tint)
     {
-        return (tint<=0.0||fmod(time2gpst(time,NULL)+DTTOL,tint)<=DTTOL*2.0)&&
-                (ts.time==0||timediff(time,ts)>=-DTTOL)&&
-                (te.time==0||timediff(time,te)<  DTTOL);
+        return (tint<=0.0||Math.mod(time2gpst(time,null)+rtklib.DTTOL,tint)<=rtklib.DTTOL*2.0)&&
+                (ts.time==0||timediff(time,ts)>=-rtklib.DTTOL)&&
+                (te.time==0||timediff(time,te)<  rtklib.DTTOL);
     }
     /* read/save navigation data ---------------------------------------------------
      * save or load navigation data
@@ -2627,11 +2630,11 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          nav_t   nav   O/I    navigation data
      * return : status (1:ok,0:no file)
      *-----------------------------------------------------------------------------*/
-    public static int readnav(final char *file, nav_t *nav)
+    public static int readnav(final char *file, rtklib.nav_t nav)
     {
-        FILE *fp;
-        eph_t eph0={0};
-        geph_t geph0={0};
+        File fp;
+        rtklib.eph_t eph0={0};
+        rtklib.geph_t geph0={0};
         char buff[4096],*p;
         long toe_time,tof_time,toc_time,ttr_time;
         int i,sat,prn;
@@ -2642,62 +2645,62 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         while (fgets(buff,sizeof(buff),fp)) {
             if (!strncmp(buff,"IONUTC",6)) {
-                for (i=0;i<8;i++) nav->ion_gps[i]=0.0;
-                for (i=0;i<4;i++) nav->utc_gps[i]=0.0;
-                nav->leaps=0;
+                for (i=0;i<8;i++) nav.ion_gps[i]=0.0;
+                for (i=0;i<4;i++) nav.utc_gps[i]=0.0;
+                nav.leaps=0;
                 sscanf(buff,"IONUTC,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%d",
-                        &nav.ion_gps[0],&nav->ion_gps[1],&nav->ion_gps[2],&nav->ion_gps[3],
-                   &nav->ion_gps[4],&nav->ion_gps[5],&nav->ion_gps[6],&nav->ion_gps[7],
-                   &nav->utc_gps[0],&nav->utc_gps[1],&nav->utc_gps[2],&nav->utc_gps[3],
-                   &nav->leaps);
+                        &nav.ion_gps[0],&nav.ion_gps[1],&nav.ion_gps[2],&nav.ion_gps[3],
+                   &nav.ion_gps[4],&nav.ion_gps[5],&nav.ion_gps[6],&nav.ion_gps[7],
+                   &nav.utc_gps[0],&nav.utc_gps[1],&nav.utc_gps[2],&nav.utc_gps[3],
+                   &nav.leaps);
                 continue;
             }
             if ((p=strchr(buff,','))) *p='\0'; else continue;
             if (!(sat=satid2no(buff))) continue;
             if (satsys(sat,&prn)==rtklib.SYS_GLO) {
-                nav->geph[prn-1]=geph0;
-                nav->geph[prn-1].sat=sat;
+                nav.geph[prn-1]=geph0;
+                nav.geph[prn-1].sat=sat;
                 toe_time=tof_time=0;
                 sscanf(p+1,"%d,%d,%d,%d,%d,%ld,%ld,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,"
                         "%lf,%lf,%lf,%lf",
-                        &nav->geph[prn-1].iode,&nav->geph[prn-1].frq,&nav->geph[prn-1].svh,
-                   &nav->geph[prn-1].sva,&nav->geph[prn-1].age,
+                        &nav.geph[prn-1].iode,&nav.geph[prn-1].frq,&nav.geph[prn-1].svh,
+                   &nav.geph[prn-1].sva,&nav.geph[prn-1].age,
                    &toe_time,&tof_time,
-                   &nav->geph[prn-1].pos[0],&nav->geph[prn-1].pos[1],&nav->geph[prn-1].pos[2],
-                   &nav->geph[prn-1].vel[0],&nav->geph[prn-1].vel[1],&nav->geph[prn-1].vel[2],
-                   &nav->geph[prn-1].acc[0],&nav->geph[prn-1].acc[1],&nav->geph[prn-1].acc[2],
-                   &nav->geph[prn-1].taun  ,&nav->geph[prn-1].gamn  ,&nav->geph[prn-1].dtaun);
-                nav->geph[prn-1].toe.time=toe_time;
-                nav->geph[prn-1].tof.time=tof_time;
+                   &nav.geph[prn-1].pos[0],&nav.geph[prn-1].pos[1],&nav.geph[prn-1].pos[2],
+                   &nav.geph[prn-1].vel[0],&nav.geph[prn-1].vel[1],&nav.geph[prn-1].vel[2],
+                   &nav.geph[prn-1].acc[0],&nav.geph[prn-1].acc[1],&nav.geph[prn-1].acc[2],
+                   &nav.geph[prn-1].taun  ,&nav.geph[prn-1].gamn  ,&nav.geph[prn-1].dtaun);
+                nav.geph[prn-1].toe.time=toe_time;
+                nav.geph[prn-1].tof.time=tof_time;
             }
         else {
-                nav->eph[sat-1]=eph0;
-                nav->eph[sat-1].sat=sat;
+                nav.eph[sat-1]=eph0;
+                nav.eph[sat-1].sat=sat;
                 toe_time=toc_time=ttr_time=0;
                 sscanf(p+1,"%d,%d,%d,%d,%ld,%ld,%ld,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,"
                         "%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%d,%d",
-                        &nav->eph[sat-1].iode,&nav->eph[sat-1].iodc,&nav->eph[sat-1].sva ,
-                   &nav->eph[sat-1].svh ,
+                        &nav.eph[sat-1].iode,&nav.eph[sat-1].iodc,&nav.eph[sat-1].sva ,
+                   &nav.eph[sat-1].svh ,
                    &toe_time,&toc_time,&ttr_time,
-                   &nav.eph[sat-1].A   ,&nav->eph[sat-1].e   ,&nav->eph[sat-1].i0  ,
-                   &nav.eph[sat-1].OMG0,&nav->eph[sat-1].omg ,&nav->eph[sat-1].M0  ,
-                   &nav->eph[sat-1].deln,&nav->eph[sat-1].OMGd,&nav->eph[sat-1].idot,
-                   &nav->eph[sat-1].crc ,&nav->eph[sat-1].crs ,&nav->eph[sat-1].cuc ,
-                   &nav->eph[sat-1].cus ,&nav->eph[sat-1].cic ,&nav->eph[sat-1].cis ,
-                   &nav->eph[sat-1].toes,&nav->eph[sat-1].fit ,&nav->eph[sat-1].f0  ,
-                   &nav->eph[sat-1].f1  ,&nav->eph[sat-1].f2  ,&nav->eph[sat-1].tgd[0],
-                   &nav->eph[sat-1].code, &nav->eph[sat-1].flag);
-                nav->eph[sat-1].toe.time=toe_time;
-                nav->eph[sat-1].toc.time=toc_time;
-                nav->eph[sat-1].ttr.time=ttr_time;
+                   &nav.eph[sat-1].A   ,&nav.eph[sat-1].e   ,&nav.eph[sat-1].i0  ,
+                   &nav.eph[sat-1].OMG0,&nav.eph[sat-1].omg ,&nav.eph[sat-1].M0  ,
+                   &nav.eph[sat-1].deln,&nav.eph[sat-1].OMGd,&nav.eph[sat-1].idot,
+                   &nav.eph[sat-1].crc ,&nav.eph[sat-1].crs ,&nav.eph[sat-1].cuc ,
+                   &nav.eph[sat-1].cus ,&nav.eph[sat-1].cic ,&nav.eph[sat-1].cis ,
+                   &nav.eph[sat-1].toes,&nav.eph[sat-1].fit ,&nav.eph[sat-1].f0  ,
+                   &nav.eph[sat-1].f1  ,&nav.eph[sat-1].f2  ,&nav.eph[sat-1].tgd[0],
+                   &nav.eph[sat-1].code, &nav.eph[sat-1].flag);
+                nav.eph[sat-1].toe.time=toe_time;
+                nav.eph[sat-1].toc.time=toc_time;
+                nav.eph[sat-1].ttr.time=ttr_time;
             }
         }
         fclose(fp);
         return 1;
     }
-    public static int savenav(final char *file, final nav_t *nav)
+    public static int savenav(final String file, final rtklib.nav_t nav)
     {
-        FILE *fp;
+        String fp = new String();
         int i;
         char id[32];
 
@@ -2706,40 +2709,41 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         if (!(fp=fopen(file,"w"))) return 0;
 
         for (i=0;i<rtklib.MAXSAT;i++) {
-            if (nav->eph[i].ttr.time==0) continue;
-            satno2id(nav->eph[i].sat,id);
-            fprintf(fp,"%s,%d,%d,%d,%d,%d,%d,%d,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
+            if (nav.eph[i].ttr.time==0) continue;
+            satno2id(nav.eph.get(i).sat,id);
+            String.format(fp,"%s,%d,%d,%d,%d,%d,%d,%d,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
                     "%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
                     "%.14E,%.14E,%.14E,%.14E,%.14E,%d,%d\n",
-                    id,nav->eph[i].iode,nav->eph[i].iodc,nav->eph[i].sva ,
-                    nav->eph[i].svh ,(int)nav->eph[i].toe.time,
-                    (int)nav->eph[i].toc.time,(int)nav->eph[i].ttr.time,
-                    nav->eph[i].A   ,nav->eph[i].e  ,nav->eph[i].i0  ,nav->eph[i].OMG0,
-                    nav->eph[i].omg ,nav->eph[i].M0 ,nav->eph[i].deln,nav->eph[i].OMGd,
-                    nav->eph[i].idot,nav->eph[i].crc,nav->eph[i].crs ,nav->eph[i].cuc ,
-                    nav->eph[i].cus ,nav->eph[i].cic,nav->eph[i].cis ,nav->eph[i].toes,
-                    nav->eph[i].fit ,nav->eph[i].f0 ,nav->eph[i].f1  ,nav->eph[i].f2  ,
-                    nav->eph[i].tgd[0],nav->eph[i].code,nav->eph[i].flag);
+                    id,nav.eph.get(i).iode,nav.eph.get(i).iodc,nav.eph.get(i).sva ,
+                    nav.eph.get(i).svh ,(int)nav.eph.get(i).toe.time,
+                    (int)nav.eph.get(i).toc.time,(int)nav.eph.get(i).ttr.time,
+                    nav.eph.get(i).A   ,nav.eph.get(i).e  ,nav.eph.get(i).i0  ,nav.eph.get(i).OMG0,
+                    nav.eph.get(i).omg ,nav.eph.get(i).M0 ,nav.eph.get(i).deln,nav.eph.get(i).OMGd,
+                    nav.eph.get(i).idot,nav.eph.get(i).crc,nav.eph.get(i).crs ,nav.eph.get(i).cuc ,
+                    nav.eph.get(i).cus ,nav.eph.get(i).cic,nav.eph.get(i).cis ,nav.eph.get(i).toes,
+                    nav.eph.get(i).fit ,nav.eph.get(i).f0 ,nav.eph.get(i).f1  ,nav.eph.get(i).f2  ,
+                    nav.eph.get(i).tgd[0],nav.eph.get(i).code,nav.eph.get(i).flag);
+            fileWrit
         }
         for (i=0;i<rtklib.MAXPRNGLO;i++) {
-            if (nav->geph[i].tof.time==0) continue;
-            satno2id(nav->geph[i].sat,id);
+            if (nav.geph[i].tof.time==0) continue;
+            satno2id(nav.geph[i].sat,id);
             fprintf(fp,"%s,%d,%d,%d,%d,%d,%d,%d,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
                     "%.14E,%.14E,%.14E,%.14E,%.14E,%.14E\n",
-                    id,nav->geph[i].iode,nav->geph[i].frq,nav->geph[i].svh,
-                    nav->geph[i].sva,nav->geph[i].age,(int)nav->geph[i].toe.time,
-                    (int)nav->geph[i].tof.time,
-                    nav->geph[i].pos[0],nav->geph[i].pos[1],nav->geph[i].pos[2],
-                    nav->geph[i].vel[0],nav->geph[i].vel[1],nav->geph[i].vel[2],
-                    nav->geph[i].acc[0],nav->geph[i].acc[1],nav->geph[i].acc[2],
-                    nav->geph[i].taun,nav->geph[i].gamn,nav->geph[i].dtaun);
+                    id,nav.geph[i].iode,nav.geph[i].frq,nav.geph[i].svh,
+                    nav.geph[i].sva,nav.geph[i].age,(int)nav.geph[i].toe.time,
+                    (int)nav.geph[i].tof.time,
+                    nav.geph[i].pos[0],nav.geph[i].pos[1],nav.geph[i].pos[2],
+                    nav.geph[i].vel[0],nav.geph[i].vel[1],nav.geph[i].vel[2],
+                    nav.geph[i].acc[0],nav.geph[i].acc[1],nav.geph[i].acc[2],
+                    nav.geph[i].taun,nav.geph[i].gamn,nav.geph[i].dtaun);
         }
         fprintf(fp,"IONUTC,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,%.14E,"
                 "%.14E,%.14E,%.14E,%d",
-                nav->ion_gps[0],nav->ion_gps[1],nav->ion_gps[2],nav->ion_gps[3],
-                nav->ion_gps[4],nav->ion_gps[5],nav->ion_gps[6],nav->ion_gps[7],
-                nav->utc_gps[0],nav->utc_gps[1],nav->utc_gps[2],nav->utc_gps[3],
-                nav->leaps);
+                nav.ion_gps[0],nav.ion_gps[1],nav.ion_gps[2],nav.ion_gps[3],
+                nav.ion_gps[4],nav.ion_gps[5],nav.ion_gps[6],nav.ion_gps[7],
+                nav.utc_gps[0],nav.utc_gps[1],nav.utc_gps[2],nav.utc_gps[3],
+                nav.leaps);
 
         fclose(fp);
         return 1;
@@ -2751,7 +2755,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void freeobs(obs_t *obs)
     {
-        free(obs->data); obs->data=NULL; obs->n=obs->nmax=0;
+        free(obs.data); obs.data=NULL; obs.n=obs.nmax=0;
     }
     /* free navigation data ---------------------------------------------------------
      * free memory for navigation data
@@ -2765,19 +2769,19 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void freenav(nav_t *nav, int opt)
     {
-        if (opt&0x01) {free(nav->eph ); nav->eph =NULL; nav->n =nav->nmax =0;}
-        if (opt&0x02) {free(nav->geph); nav->geph=NULL; nav->ng=nav->ngmax=0;}
-        if (opt&0x04) {free(nav->seph); nav->seph=NULL; nav->ns=nav->nsmax=0;}
-        if (opt&0x08) {free(nav->peph); nav->peph=NULL; nav->ne=nav->nemax=0;}
-        if (opt&0x10) {free(nav->pclk); nav->pclk=NULL; nav->nc=nav->ncmax=0;}
-        if (opt&0x20) {free(nav->alm ); nav->alm =NULL; nav->na=nav->namax=0;}
-        if (opt&0x40) {free(nav->tec ); nav->tec =NULL; nav->nt=nav->ntmax=0;}
-        if (opt&0x80) {free(nav->fcb ); nav->fcb =NULL; nav->nf=nav->nfmax=0;}
+        if (opt&0x01) {free(nav.eph ); nav.eph =NULL; nav.n =nav.nmax =0;}
+        if (opt&0x02) {free(nav.geph); nav.geph=NULL; nav.ng=nav.ngmax=0;}
+        if (opt&0x04) {free(nav.seph); nav.seph=NULL; nav.ns=nav.nsmax=0;}
+        if (opt&0x08) {free(nav.peph); nav.peph=NULL; nav.ne=nav.nemax=0;}
+        if (opt&0x10) {free(nav.pclk); nav.pclk=NULL; nav.nc=nav.ncmax=0;}
+        if (opt&0x20) {free(nav.alm ); nav.alm =NULL; nav.na=nav.namax=0;}
+        if (opt&0x40) {free(nav.tec ); nav.tec =NULL; nav.nt=nav.ntmax=0;}
+        if (opt&0x80) {free(nav.fcb ); nav.fcb =NULL; nav.nf=nav.nfmax=0;}
     }
     /* debug trace functions -----------------------------------------------------*/
 #ifdef TRACE
 
-    static FILE *fp_trace=NULL;     /* file pointer of trace */
+    static File *fp_trace=NULL;     /* file pointer of trace */
     static char file_trace[1024];   /* trace file */
     static int level_trace=0;       /* level of trace */
     static unsigned int tick_trace=0; /* tick time at traceopen (ms) */
@@ -2882,19 +2886,19 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         int i;
 
         if (!fp_trace||level>level_trace) return;
-        for (i=0;i<nav->n;i++) {
-            time2str(nav->eph[i].toe,s1,0);
-            time2str(nav->eph[i].ttr,s2,0);
-            satno2id(nav->eph[i].sat,id);
+        for (i=0;i<nav.n;i++) {
+            time2str(nav.eph[i].toe,s1,0);
+            time2str(nav.eph[i].ttr,s2,0);
+            satno2id(nav.eph[i].sat,id);
             fprintf(fp_trace,"(%3d) %-3s : %s %s %3d %3d %02x\n",i+1,
-                    id,s1,s2,nav->eph[i].iode,nav->eph[i].iodc,nav->eph[i].svh);
+                    id,s1,s2,nav.eph[i].iode,nav.eph[i].iodc,nav.eph[i].svh);
         }
-        fprintf(fp_trace,"(ion) %9.4e %9.4e %9.4e %9.4e\n",nav->ion_gps[0],
-                nav->ion_gps[1],nav->ion_gps[2],nav->ion_gps[3]);
-        fprintf(fp_trace,"(ion) %9.4e %9.4e %9.4e %9.4e\n",nav->ion_gps[4],
-                nav->ion_gps[5],nav->ion_gps[6],nav->ion_gps[7]);
-        fprintf(fp_trace,"(ion) %9.4e %9.4e %9.4e %9.4e\n",nav->ion_gal[0],
-                nav->ion_gal[1],nav->ion_gal[2],nav->ion_gal[3]);
+        fprintf(fp_trace,"(ion) %9.4e %9.4e %9.4e %9.4e\n",nav.ion_gps[0],
+                nav.ion_gps[1],nav.ion_gps[2],nav.ion_gps[3]);
+        fprintf(fp_trace,"(ion) %9.4e %9.4e %9.4e %9.4e\n",nav.ion_gps[4],
+                nav.ion_gps[5],nav.ion_gps[6],nav.ion_gps[7]);
+        fprintf(fp_trace,"(ion) %9.4e %9.4e %9.4e %9.4e\n",nav.ion_gal[0],
+                nav.ion_gal[1],nav.ion_gal[2],nav.ion_gal[3]);
     }
     public static void tracegnav(int level, final nav_t *nav)
     {
@@ -2902,12 +2906,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         int i;
 
         if (!fp_trace||level>level_trace) return;
-        for (i=0;i<nav->ng;i++) {
-            time2str(nav->geph[i].toe,s1,0);
-            time2str(nav->geph[i].tof,s2,0);
-            satno2id(nav->geph[i].sat,id);
+        for (i=0;i<nav.ng;i++) {
+            time2str(nav.geph[i].toe,s1,0);
+            time2str(nav.geph[i].tof,s2,0);
+            satno2id(nav.geph[i].sat,id);
             fprintf(fp_trace,"(%3d) %-3s : %s %s %2d %2d %8.3f\n",i+1,
-                    id,s1,s2,nav->geph[i].frq,nav->geph[i].svh,nav->geph[i].taun*1E6);
+                    id,s1,s2,nav.geph[i].frq,nav.geph[i].svh,nav.geph[i].taun*1E6);
         }
     }
     public static void tracehnav(int level, final nav_t *nav)
@@ -2916,12 +2920,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         int i;
 
         if (!fp_trace||level>level_trace) return;
-        for (i=0;i<nav->ns;i++) {
-            time2str(nav->seph[i].t0,s1,0);
-            time2str(nav->seph[i].tof,s2,0);
-            satno2id(nav->seph[i].sat,id);
+        for (i=0;i<nav.ns;i++) {
+            time2str(nav.seph[i].t0,s1,0);
+            time2str(nav.seph[i].tof,s2,0);
+            satno2id(nav.seph[i].sat,id);
             fprintf(fp_trace,"(%3d) %-3s : %s %s %2d %2d\n",i+1,
-                    id,s1,s2,nav->seph[i].svh,nav->seph[i].sva);
+                    id,s1,s2,nav.seph[i].svh,nav.seph[i].sva);
         }
     }
     public static void tracepeph(int level, final nav_t *nav)
@@ -2931,16 +2935,16 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         if (!fp_trace||level>level_trace) return;
 
-        for (i=0;i<nav->ne;i++) {
-            time2str(nav->peph[i].time,s,0);
+        for (i=0;i<nav.ne;i++) {
+            time2str(nav.peph[i].time,s,0);
             for (j=0;j<rtklib.MAXSAT;j++) {
                 satno2id(j+1,id);
                 fprintf(fp_trace,"%-3s %d %-3s %13.3f %13.3f %13.3f %13.3f %6.3f %6.3f %6.3f %6.3f\n",
-                        s,nav->peph[i].index,id,
-                        nav->peph[i].pos[j][0],nav->peph[i].pos[j][1],
-                        nav->peph[i].pos[j][2],nav->peph[i].pos[j][3]*1E9,
-                        nav->peph[i].std[j][0],nav->peph[i].std[j][1],
-                        nav->peph[i].std[j][2],nav->peph[i].std[j][3]*1E9);
+                        s,nav.peph[i].index,id,
+                        nav.peph[i].pos[j][0],nav.peph[i].pos[j][1],
+                        nav.peph[i].pos[j][2],nav.peph[i].pos[j][3]*1E9,
+                        nav.peph[i].std[j][0],nav.peph[i].std[j][1],
+                        nav.peph[i].std[j][2],nav.peph[i].std[j][3]*1E9);
             }
         }
     }
@@ -2951,13 +2955,13 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         if (!fp_trace||level>level_trace) return;
 
-        for (i=0;i<nav->nc;i++) {
-            time2str(nav->pclk[i].time,s,0);
+        for (i=0;i<nav.nc;i++) {
+            time2str(nav.pclk[i].time,s,0);
             for (j=0;j<rtklib.MAXSAT;j++) {
                 satno2id(j+1,id);
                 fprintf(fp_trace,"%-3s %d %-3s %13.3f %6.3f\n",
-                        s,nav->pclk[i].index,id,
-                        nav->pclk[i].clk[j][0]*1E9,nav->pclk[i].std[j][0]*1E9);
+                        s,nav.pclk[i].index,id,
+                        nav.pclk[i].clk[j][0]*1E9,nav.pclk[i].std[j][0]*1E9);
             }
         }
     }
@@ -3043,7 +3047,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     }
         sprintf(paths[n++],"%s%s",dir,file.cFileName);
         while (FindNextFile(h,&file)&&n<nmax) {
-        if (file.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) continue;
+        if (file.dwFileAttributes&File_ATTRIBUTE_DIRECTORY) continue;
         sprintf(paths[n++],"%s%s",dir,file.cFileName);
     }
         FindClose(h);
@@ -3060,8 +3064,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         }
         if (!(dp=opendir(*dir?dir:"."))) return 0;
         while ((d=readdir(dp))) {
-            if (*(d->d_name)=='.') continue;
-            sprintf(s1,"^%s$",d->d_name);
+            if (*(d.d_name)=='.') continue;
+            sprintf(s1,"^%s$",d.d_name);
             sprintf(s2,"^%s$",file);
             for (p=s1;*p;p++) *p=(char)tolower((int)*p);
             for (p=s2;*p;p++) *p=(char)tolower((int)*p);
@@ -3069,7 +3073,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             for (p=s1,q=strtok_r(s2,"*",&r);q;q=strtok_r(NULL,"*",&r)) {
                 if ((p=strstr(p,q))) p+=strlen(q); else break;
             }
-            if (p&&n<nmax) sprintf(paths[n++],"%s%s",dir,d->d_name);
+            if (p&&n<nmax) sprintf(paths[n++],"%s%s",dir,d.d_name);
         }
         closedir(dp);
 #endif
@@ -3100,7 +3104,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         tracet(3,"createdir: path=%s\n",path);
 
         strcpy(buff,path);
-        if (!(p=strrchr(buff,FILEPATHSEP))) return;
+        if (!(p=strrchr(buff,FilePATHSEP))) return;
     *p='\0';
 
 #ifdef WIN32
@@ -3136,23 +3140,23 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : status (1:keywords replaced, 0:no valid keyword in the path,
      *                  -1:no valid time)
      * notes  : the following keywords in path are replaced by date, time and name
-     *              %Y -> yyyy : year (4 digits) (1900-2099)
-     *              %y -> yy   : year (2 digits) (00-99)
-     *              %m -> mm   : month           (01-12)
-     *              %d -> dd   : day of month    (01-31)
-     *              %h -> hh   : hours           (00-23)
-     *              %M -> mm   : minutes         (00-59)
-     *              %S -> ss   : seconds         (00-59)
-     *              %n -> ddd  : day of year     (001-366)
-     *              %W -> wwww : gps week        (0001-9999)
-     *              %D -> d    : day of gps week (0-6)
-     *              %H -> h    : hour code       (a=0,b=1,c=2,...,x=23)
-     *              %ha-> hh   : 3 hours         (00,03,06,...,21)
-     *              %hb-> hh   : 6 hours         (00,06,12,18)
-     *              %hc-> hh   : 12 hours        (00,12)
-     *              %t -> mm   : 15 minutes      (00,15,30,45)
-     *              %r -> rrrr : rover id
-     *              %b -> bbbb : base station id
+     *              %Y . yyyy : year (4 digits) (1900-2099)
+     *              %y . yy   : year (2 digits) (00-99)
+     *              %m . mm   : month           (01-12)
+     *              %d . dd   : day of month    (01-31)
+     *              %h . hh   : hours           (00-23)
+     *              %M . mm   : minutes         (00-59)
+     *              %S . ss   : seconds         (00-59)
+     *              %n . ddd  : day of year     (001-366)
+     *              %W . wwww : gps week        (0001-9999)
+     *              %D . d    : day of gps week (0-6)
+     *              %H . h    : hour code       (a=0,b=1,c=2,...,x=23)
+     *              %ha. hh   : 3 hours         (00,03,06,...,21)
+     *              %hb. hh   : 6 hours         (00,06,12,18)
+     *              %hc. hh   : 12 hours        (00,12)
+     *              %t . mm   : 15 minutes      (00,15,30,45)
+     *              %r . rrrr : rover id
+     *              %b . bbbb : base station id
      *-----------------------------------------------------------------------------*/
     public static int reppath(final String path, String rpath, rtklib.gtime_t time, final String rov,
                    final String base)
@@ -3602,9 +3606,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         e[2]=Math.sin(azel[1]);
 
         for (i=0;i<NFREQ;i++) {
-            for (j=0;j<3;j++) off[j]=pcv->off[i][j]+del[j];
+            for (j=0;j<3;j++) off[j]=pcv.off[i][j]+del[j];
 
-            dant[i]=-dot(off,e,3)+(opt?interpvar(90.0-azel[1]*R2D,pcv->var[i]):0.0);
+            dant[i]=-dot(off,e,3)+(opt?interpvar(90.0-azel[1]*R2D,pcv.var[i]):0.0);
         }
         trace(5,"antmodel: dant=%6.3f %6.3f\n",dant[0],dant[1]);
     }
@@ -3622,7 +3626,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         trace(4,"antmodel_s: nadir=%6.1f\n",nadir*R2D);
 
         for (i=0;i<NFREQ;i++) {
-            dant[i]=interpvar(nadir*R2D*5.0,pcv->var[i]);
+            dant[i]=interpvar(nadir*R2D*5.0,pcv.var[i]);
         }
         trace(5,"antmodel_s: dant=%6.3f %6.3f\n",dant[0],dant[1]);
     }
@@ -3689,7 +3693,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         trace(4,"sunmoonpos: tutc=%s\n",time_str(tutc,3));
 
-        tut=timeadd(tutc,erpv[2]); /* utc -> ut1 */
+        tut=timeadd(tutc,erpv[2]); /* utc . ut1 */
 
         /* sun and moon position in eci */
         sunmoonpos_eci(tut,rsun?rs:NULL,rmoon?rm:NULL);
@@ -3714,21 +3718,21 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         int i,j,s,r,n[2][rtklib.MAXSAT][NFREQ]={{{0}}};
         rtklib.obsd_t p;
 
-        trace(3,"csmooth: nobs=%d,ns=%d\n",obs->n,ns);
+        trace(3,"csmooth: nobs=%d,ns=%d\n",obs.n,ns);
 
-        for (i=0;i<obs->n;i++) {
-            p=&obs->data[i]; s=p->sat; r=p->rcv;
+        for (i=0;i<obs.n;i++) {
+            p=&obs.data[i]; s=p.sat; r=p.rcv;
             for (j=0;j<NFREQ;j++) {
                 if (s<=0||rtklib.MAXSAT<s||r<=0||2<r) continue;
-                if (p->P[j]==0.0||p->L[j]==0.0) continue;
-                if (p->LLI[j]) n[r-1][s-1][j]=0;
-                if (n[r-1][s-1][j]==0) Ps[r-1][s-1][j]=p->P[j];
+                if (p.P[j]==0.0||p.L[j]==0.0) continue;
+                if (p.LLI[j]) n[r-1][s-1][j]=0;
+                if (n[r-1][s-1][j]==0) Ps[r-1][s-1][j]=p.P[j];
                 else {
-                    dcp=lam_carr[j]*(p->L[j]-Lp[r-1][s-1][j]);
-                    Ps[r-1][s-1][j]=p->P[j]/ns+(Ps[r-1][s-1][j]+dcp)*(ns-1)/ns;
+                    dcp=lam_carr[j]*(p.L[j]-Lp[r-1][s-1][j]);
+                    Ps[r-1][s-1][j]=p.P[j]/ns+(Ps[r-1][s-1][j]+dcp)*(ns-1)/ns;
                 }
-                if (++n[r-1][s-1][j]<ns) p->P[j]=0.0; else p->P[j]=Ps[r-1][s-1][j];
-                Lp[r-1][s-1][j]=p->L[j];
+                if (++n[r-1][s-1][j]<ns) p.P[j]=0.0; else p.P[j]=Ps[r-1][s-1][j];
+                Lp[r-1][s-1][j]=p.L[j];
             }
         }
     }

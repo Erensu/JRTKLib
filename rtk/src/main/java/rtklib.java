@@ -444,7 +444,7 @@ public class rtklib {
         double sec;         /* fraction of second under 1 s */
     };
 
-    public class obsd_t {        /* observation data record */
+    public  static class obsd_t {        /* observation data record */
         gtime_t time;       /* receiver sampling time (GPST) */
         byte sat,rcv; /* satellite/receiver number */
         byte[] SNR = new byte[NFREQ+NEXOBS]; /* signal strength (0.25 dBHz) */
@@ -455,12 +455,12 @@ public class rtklib {
         float[]  D = new float[NFREQ+NEXOBS]; /* observation data doppler frequency (Hz) */
     };
 
-    public class obs_t {        /* observation data */
+    public static class obs_t {        /* observation data */
         int n,nmax;         /* number of obervation data/allocated */
-        obsd_t data;       /* observation data records */
+        List<obsd_t> data = new ArrayList<obsd_t>();       /* observation data records */
     } ;
 
-    public class erpd_t {        /* earth rotation parameter data type */
+    public static class erpd_t {        /* earth rotation parameter data type */
         double mjd;         /* mjd (days) */
         double xp,yp;       /* pole offset (rad) */
         double xpr,ypr;     /* pole offset rate (rad/day) */
@@ -468,12 +468,12 @@ public class rtklib {
         double lod;         /* length of day (s/day) */
     } ;
 
-    public class erp_t {        /* earth rotation parameter type */
+    public static class erp_t {        /* earth rotation parameter type */
         int n,nmax;         /* number and max number of data */
         List<erpd_t> data = new ArrayList<erpd_t>();       /* earth rotation parameter data */
     } ;
 
-    public class pcv_t {        /* antenna parameter type */
+    public static class pcv_t {        /* antenna parameter type */
         int sat;            /* satellite number (0:receiver) */
         byte[] type = new byte[MAXANT];  /* antenna type */
         byte[] code = new byte[MAXANT];  /* serial number or satellite code */
@@ -483,12 +483,12 @@ public class rtklib {
         /* el=90,85,...,0 or nadir=0,1,2,3,... (deg) */
     } ;
 
-    public class pcvs_t {        /* antenna parameters type */
+    public static class pcvs_t {        /* antenna parameters type */
         int n,nmax;         /* number of data/allocated */
         pcv_t pcv;         /* antenna parameters data */
     } ;
 
-    public class alm_t {        /* almanac type */
+    public static class alm_t {        /* almanac type */
         int sat;            /* satellite number */
         int svh;            /* sv health (0:ok) */
         int svconf;         /* as and sv config */
@@ -500,7 +500,7 @@ public class rtklib {
         double f0,f1;       /* SV clock parameters (af0,af1) */
     } ;
 
-    public class eph_t {        /* GPS/QZS/GAL broadcast ephemeris type */
+    public static class eph_t {        /* GPS/QZS/GAL broadcast ephemeris type */
         int sat;            /* satellite number */
         int iode,iodc;      /* IODE,IODC */
         int sva;            /* SV accuracy (URA index) */
@@ -525,7 +525,7 @@ public class rtklib {
         double Adot,ndot;   /* Adot,ndot for CNAV */
     } ;
 
-    public class geph_t {        /* GLONASS broadcast ephemeris type */
+    public static class geph_t {        /* GLONASS broadcast ephemeris type */
         int sat;            /* satellite number */
         int iode;           /* IODE (0-6 bit of tb field) */
         int frq;            /* satellite frequency number */
@@ -537,9 +537,9 @@ public class rtklib {
         double[] acc = new double[3];      /* satellite acceleration (ecef) (m/s^2) */
         double taun,gamn;   /* SV clock bias (s)/relative freq bias */
         double dtaun;       /* delay between L1 and L2 (s) */
-    } ;
+    }
 
-    public class peph_t {        /* precise ephemeris type */
+    public static class peph_t {        /* precise ephemeris type */
         gtime_t time;       /* time (GPST) */
         int index;          /* ephemeris index for multiple files */
         double[][] pos = new double[MAXSAT][4]; /* satellite position/clock (ecef) (m|s) */
@@ -548,16 +548,16 @@ public class rtklib {
         float[][]  vst = new float[MAXSAT][4]; /* satellite velocity/clk-rate std (m/s|s/s) */
         float[][]  cov = new float[MAXSAT][3]; /* satellite position covariance (m^2) */
         float[][]  vco = new float[MAXSAT][3]; /* satellite velocity covariance (m^2) */
-    } ;
+    }
 
-    public class pclk_t {        /* precise clock type */
+    public static class pclk_t {        /* precise clock type */
         gtime_t time;       /* time (GPST) */
         int index;          /* clock index for multiple files */
         double[][] clk = new double[MAXSAT][1]; /* satellite clock (s) */
         float[][]  std = new float[MAXSAT][1]; /* satellite clock std (s) */
-    } ;
+    }
 
-    public class seph_t {        /* SBAS ephemeris type */
+    public static class seph_t {        /* SBAS ephemeris type */
         int sat;            /* satellite number */
         gtime_t t0;         /* reference epoch time (GPST) */
         gtime_t tof;        /* time of message frame (GPST) */
@@ -567,9 +567,9 @@ public class rtklib {
         double[] vel = new double[3];      /* satellite velocity (m/s) (ecef) */
         double[] acc = new double[3];      /* satellite acceleration (m/s^2) (ecef) */
         double af0,af1;     /* satellite clock-offset/drift (s,s/s) */
-    } ;
+    }
 
-    public class tled_t {        /* norad two line element data type */
+    public static class tled_t {        /* norad two line element data type */
         byte[] name  = new byte[32];     /* common name */
         byte[] alias = new byte[32];     /* alias name */
         byte[] satno = new byte[16];     /* satellilte catalog number */
@@ -588,12 +588,12 @@ public class rtklib {
         double M;           /* mean anomaly (deg) */
         double n;           /* mean motion (rev/day) */
         int rev;            /* revolution number at epoch */
-    } ;
+    }
 
-    public class tle_t {        /* norad two line element type */
+    public static class tle_t {        /* norad two line element type */
         int n,nmax;         /* number/max number of two line element data */
         tled_t data;       /* norad two line element data */
-    } ;
+    }
 
     public class tec_t {        /* TEC grid type */
         gtime_t time;       /* epoch time (GPST) */
@@ -604,24 +604,24 @@ public class rtklib {
         double[] hgts = new double[3];     /* heights start/interval (km) */
         double data;       /* TEC grid data (tecu) */
         float rms;         /* RMS values (tecu) */
-    } ;
+    }
 
     public class fcbd_t {        /* satellite fcb data type */
         gtime_t ts,te;      /* start/end time (GPST) */
         double[][] bias = new double[MAXSAT][3]; /* fcb value   (cyc) */
         double[][] std  = new double[MAXSAT][3]; /* fcb std-dev (cyc) */
-    } ;
+    }
 
     public class sbsmsg_t {        /* SBAS message type */
         int week,tow;       /* receiption time */
         int prn;            /* SBAS satellite PRN number */
         char[] msg = new char[29]; /* SBAS message (226bit) padded by 0 */
-    } ;
+    }
 
     public class sbs_t {        /* SBAS messages type */
         int n,nmax;         /* number of SBAS messages/allocated */
         sbsmsg_t msgs;     /* SBAS messages */
-    } ;
+    }
 
     public class sbsfcorr_t {        /* SBAS fast correction type */
         gtime_t t0;         /* time of applicability (TOF) */
@@ -631,7 +631,7 @@ public class rtklib {
         int iodf;           /* IODF (issue of date fast corr) */
         short udre;         /* UDRE+1 */
         short ai;           /* degradation factor indicator */
-    } ;
+    }
 
     public class sbslcorr_t {        /* SBAS long term satellite error correction type */
         gtime_t t0;         /* correction time */
@@ -639,40 +639,40 @@ public class rtklib {
         double[] dpos = new double[3];     /* delta position (m) (ecef) */
         double[] dvel = new double[3];     /* delta velocity (m/s) (ecef) */
         double daf0,daf1;   /* delta clock-offset/drift (s,s/s) */
-    } ;
+    }
 
     public class sbssatp_t {        /* SBAS satellite correction type */
         int sat;            /* satellite number */
         sbsfcorr_t fcorr;   /* fast correction */
         sbslcorr_t lcorr;   /* long term correction */
-    } ;
+    }
 
     public class sbssat_t {        /* SBAS satellite corrections type */
         int iodp;           /* IODP (issue of date mask) */
         int nsat;           /* number of satellites */
         int tlat;           /* system latency (s) */
         sbssatp_t[] sat = new sbssatp_t[MAXSAT]; /* satellite correction */
-    } ;
+    }
 
     public class sbsigp_t {        /* SBAS ionospheric correction type */
         gtime_t t0;         /* correction time */
         short lat,lon;      /* latitude/longitude (deg) */
         short give;         /* GIVI+1 */
         float delay;        /* vertical delay estimate (m) */
-    } ;
+    }
 
     public class sbsigpband_t {        /* IGP band type */
         short x;            /* longitude/latitude (deg) */
         short y;     /* latitudes/longitudes (deg) */
         byte bits; /* IGP mask start bit */
         byte bite; /* IGP mask end bit */
-    } ;
+    }
 
     public class sbsion_t {        /* SBAS ionospheric corrections type */
         int iodi;           /* IODI (issue of date ionos corr) */
         int nigp;           /* number of igps */
         sbsigp_t[] igp = new sbsigp_t[MAXNIGP]; /* ionospheric correction */
-    } ;
+    }
 
     public class dgps_t {        /* DGPS/GNSS correction type */
         gtime_t t0;         /* correction time */
@@ -680,9 +680,9 @@ public class rtklib {
         double rrc;         /* range rate correction (RRC) (m/s) */
         int iod;            /* issue of data (IOD) */
         double udre;        /* UDRE */
-    } ;
+    }
 
-    public class ssr_t {        /* SSR correction type */
+    public static class ssr_t {        /* SSR correction type */
         gtime_t[] t0 = new gtime_t[6];      /* epoch time (GPST) {eph,clk,hrclk,ura,bias,pbias} */
         double[] udi = new double[6];      /* SSR update interval (s) */
         int[] iod = new int[6];         /* iod ssr {eph,clk,hrclk,ura,bias,pbias} */
@@ -699,7 +699,7 @@ public class rtklib {
         float[]  stdpb = new float[MAXCODE]; /* std-dev of phase biases (m) */
         double yaw_ang,yaw_rate; /* yaw angle and yaw rate (deg,deg/s) */
         byte update; /* update flag (0:no update,1:update) */
-    } ;
+    }
 
     public class lexmsg_t {        /* QZSS LEX message type */
         int prn;            /* satellite PRN number */
@@ -709,12 +709,12 @@ public class rtklib {
         byte snr;  /* signal C/N0 (0.25 dBHz) */
         long ttt;   /* tracking time (ms) */
         byte[] msg = new byte[212]; /* LEX message data part 1695 bits */
-    } ;
+    }
 
     public class lex_t {        /* QZSS LEX messages type */
         int n,nmax;         /* number of LEX messages and allocated */
         lexmsg_t msgs;     /* LEX messages */
-    } ;
+    }
 
     public class lexeph_t {        /* QZSS LEX ephemeris type */
         gtime_t toe;        /* epoch time (GPST) */
@@ -729,14 +729,14 @@ public class rtklib {
         double af0,af1;     /* satellite clock bias and drift (s,s/s) */
         double tgd;         /* TGD */
         double[] isc = new double[8];      /* ISC */
-    } ;
+    }
 
     public class lexion_t {        /* QZSS LEX ionosphere correction type */
         gtime_t t0;         /* epoch time (GPST) */
         double tspan;       /* valid time span (s) */
         double[] pos0 = new double[2];     /* reference position {lat,lon} (rad) */
         double[][] coef = new double[3][2];  /* coefficients lat x lon (3 x 2) */
-    } ;
+    }
 
     public class stec_t {        /* stec data type */
         gtime_t time;       /* time (GPST) */
@@ -745,13 +745,13 @@ public class rtklib {
         float std;          /* std-dev (m) */
         float[] azel = new float[2];      /* azimuth/elevation (rad) */
         byte flag; /* fix flag */
-    } ;
+    }
 
     public class trop_t {        /* trop data type */
         gtime_t time;       /* time (GPST) */
         double[] trp = new double[3];      /* zenith tropos delay/gradient (m) */
         float[] std = new float[3];       /* std-dev (m) */
-    } ;
+    }
 
     public class pppcorr_t {        /* ppp corrections type */
         int nsta;           /* number of stations */
@@ -763,7 +763,7 @@ public class rtklib {
         int[] ntmax = new int[MAXSTA]; /* number of trop data */
         List<stec_t[]> stec = new ArrayList<stec_t[]>(); /* stec data with size [MAXSTA] */
         List<trop_t[]> trop = new ArrayList<trop_t[]>(); /* trop data with size [MAXSTA] */
-    } ;
+    }
 
     public class nav_t {        /* navigation data type */
         int n,nmax;         /* number of broadcast ephemeris */
@@ -810,7 +810,7 @@ public class rtklib {
         lexeph_t[] lexeph = new lexeph_t[MAXSAT]; /* LEX ephemeris */
         lexion_t lexion;    /* LEX ionosphere correction */
         pppcorr_t pppcorr;  /* ppp corrections */
-    } ;
+    }
 
     public class sta_t {        /* station parameter type */
         char[] name   = new char[MAXANT]; /* marker name */
@@ -826,7 +826,7 @@ public class rtklib {
         double[] pos = new double[3];      /* station position (ecef) (m) */
         double[] del = new double[3];      /* antenna position delta (e/n/u or x/y/z) (m) */
         double hgt;         /* antenna height (m) */
-    } ;
+    }
 
     public class sol_t {        /* solution type */
         gtime_t time;       /* time (GPST) */
@@ -843,7 +843,7 @@ public class rtklib {
         float age;          /* age of differential (s) */
         float ratio;        /* AR ratio factor for valiation */
         float thres;        /* AR ratio threshold for valiation */
-    } ;
+    }
 
     public class solbuf_t {        /* solution buffer type */
         int n,nmax;         /* number of solution/max number of buffer */
@@ -854,7 +854,7 @@ public class rtklib {
         double[] rb= new double[3];       /* reference position {x,y,z} (ecef) (m) */
         byte[] buff = new byte[MAXSOLMSG+1]; /* message buffer */
         int nb;             /* number of byte in message buffer */
-    } ;
+    }
 
     public class solstat_t {        /* solution status type */
         gtime_t time;       /* time (GPST) */
@@ -869,12 +869,12 @@ public class rtklib {
         int outc;  /* outage counter */
         int slipc; /* slip counter */
         int rejc;  /* reject counter */
-    } ;
+    }
 
     public class solstatbuf_t {        /* solution status buffer type */
         int n,nmax;         /* number of solution/max number of buffer */
         solstat_t data;    /* solution status data */
-    } ;
+    }
 
     public class rtcm_t {        /* RTCM control struct type */
         int staid;          /* station id */
@@ -905,7 +905,7 @@ public class rtklib {
         long[] nmsg2 = new long[100]; /* message count of RTCM 2 (1-99:1-99,0:other) */
         long[] nmsg3 = new long[400]; /* message count of RTCM 3 (1-299:1001-1299,300-399:2000-2099,0:ohter) */
         char[] opt = new char[256];      /* RTCM dependent options */
-    } ;
+    }
 
     public class rnxctr_t {        /* rinex control struct type */
         gtime_t time;       /* message time */
@@ -919,14 +919,14 @@ public class rtklib {
         sta_t  sta;         /* station info */
         int    ephsat;      /* ephemeris satellite number */
         char[]   opt = new char[256];    /* rinex dependent options */
-    } ;
+    }
 
     public class url_t {        /* download url type */
         char[] type = new char[32];      /* data type */
         char[] path = new char[1024];    /* url path */
         char[] dir = new char[1024];    /* local directory */
         double tint;        /* time interval (s) */
-    } ;
+    }
 
     public static class opt_t {        /* option type */
         public static final String name = new String();   /* option name */
@@ -934,7 +934,7 @@ public class rtklib {
         // todo: Need to find the type
         // void *var;          /* pointer to option variable */
         public static final String comment = new String(); /* option comment/enum labels/unit */
-    } ;
+    }
 
     public class exterr_t {        /* extended receiver error model */
         int[] ena = new int[4];         /* model enabled */
@@ -942,12 +942,12 @@ public class rtklib {
         double[][] perr = new double[4][NFREQ*2]; /* carrier-phase errors (m) */
         double[] gpsglob = new double[NFREQ]; /* gps-glonass h/w bias (m) */
         double[] gloicb = new double [NFREQ]; /* glonass interchannel bias (m/fn) */
-    } ;
+    }
 
     public class snrmask_t {        /* SNR mask type */
         int[] ena = new int[2];         /* enable flag {rover,base} */
         double[][] mask = new double[NFREQ][9]; /* mask (dBHz) at 5,10,...85 deg */
-    } ;
+    }
 
     public class prcopt_t {        /* processing options type */
         int mode;           /* positioning mode (PMODE_???) */
@@ -1009,7 +1009,7 @@ public class rtklib {
         exterr_t exterr;    /* extended receiver error model */
         int freqopt;        /* disable L2-AR */
         char[] pppopt = new char[256];   /* ppp option */
-    } ;
+    }
 
     public class solopt_t {        /* solution options type */
         int posf;           /* solution format (SOLF_???) */
