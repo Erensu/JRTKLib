@@ -137,6 +137,7 @@ import org.apache.commons.math3.linear.RealVector;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.time.Instant;
 
 public class rtkcmn{
     /* constants -----------------------------------------------------------------*/
@@ -872,6 +873,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         c[1]=a[2]*b[0]-a[0]*b[2];
         c[2]=a[0]*b[1]-a[1]*b[0];
     }
+
     /* normalize 3d vector ---------------------------------------------------------
      * normalize 3d vector
      * args   : double *a        I   vector a (3 x 1)
@@ -888,6 +890,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         b = a.mapDivide(r);
         return 1;
     }
+
     /* copy matrix -----------------------------------------------------------------
      * copy matrix
      * args   : double *A        O   destination matrix A (n x m)
@@ -1138,11 +1141,13 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             }
             fileWriter.write("\n");
         }
+        fileWriter.close();
     }
     public static void matprint(final RealMatrix A, int n, int m, int p, int q)
     {
         matfprint(A,n,m,p,q,System.out);
     }
+
     /* string to number ------------------------------------------------------------
      * convert substring in string to number
      * args   : char   *s        I   string ("... nnn.nnn ...")
@@ -1152,13 +1157,18 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static double str2num(final String s, int i, int n)
     {
         double value;
-        char str[256],*p=str;
+        char[] str = new char[256];
+        *p=str;
 
-        if (i<0||(int)strlen(s)<i||(int)sizeof(str)-1<n) return 0.0;
-        for (s+=i;*s&&--n>=0;s++) *p++=*s=='d'||*s=='D'?'E':*s;
-    *p='\0';
+        if (i<0||(int)strlen(s)<i||(int)sizeof(str)-1<n)
+            return 0.0;
+        for (s+=i;*s&&--n>=0;s++)
+            *p++=*s=='d'||*s=='D'?'E':*s;
+        *p='\0';
+
         return sscanf(str,"%lf",&value)==1?value:0.0;
     }
+
     /* string to time --------------------------------------------------------------
      * convert substring in string to gtime_t struct
      * args   : char   *s        I   string ("... yyyy mm dd hh mm ss ...")
@@ -1166,41 +1176,51 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          gtime_t *t       O   gtime_t struct
      * return : status (0:ok,0>:error)
      *-----------------------------------------------------------------------------*/
-    public static int str2time(final char *s, int i, int n, gtime_t *t)
+    public static int str2time(final String s, int i, int n, rtklib.gtime_t t)
     {
         double ep[6];
         char str[256],*p=str;
 
-        if (i<0||(int)strlen(s)<i||(int)sizeof(str)-1<i) return -1;
-        for (s+=i;*s&&--n>=0;) *p++=*s++;
-    *p='\0';
+        if (i<0||(int)strlen(s)<i||(int)sizeof(str)-1<i)
+            return -1;
+
+        for (s+=i;*s&&--n>=0;)
+            *p++=*s++;
+        *p='\0';
+
         if (sscanf(str,"%lf %lf %lf %lf %lf %lf",ep,ep+1,ep+2,ep+3,ep+4,ep+5)<6)
             return -1;
-        if (ep[0]<100.0) ep[0]+=ep[0]<80.0?2000.0:1900.0;
-    *t=epoch2time(ep);
+
+        if (ep[0]<100.0)
+            ep[0]+=ep[0]<80.0?2000.0:1900.0;
+
+        t=epoch2time(ep);
         return 0;
     }
+
     /* convert calendar day/time to time -------------------------------------------
      * convert calendar day/time to gtime_t struct
      * args   : double *ep       I   day/time {year,month,day,hour,min,sec}
      * return : gtime_t struct
      * notes  : proper in 1970-2037 or 1970-2099 (64bit time_t)
      *-----------------------------------------------------------------------------*/
-    public static gtime_t epoch2time(final double *ep)
+    public static rtklib.gtime_t epoch2time(final double[] ep)
     {
-    final int doy[]={1,32,60,91,121,152,182,213,244,274,305,335};
-        gtime_t time={0};
+        final int doy[]={1,32,60,91,121,152,182,213,244,274,305,335};
+        rtklib.gtime_t time = new rtklib.gtime_t();
         int days,sec,year=(int)ep[0],mon=(int)ep[1],day=(int)ep[2];
 
-        if (year<1970||2099<year||mon<1||12<mon) return time;
+        if (year<1970||2099<year||mon<1||12<mon)
+            return time;
 
         /* leap year if year%4==0 in 1901-2099 */
         days=(year-1970)*365+(year-1969)/4+doy[mon-1]+day-2+(year%4==0&&mon>=3?1:0);
-        sec=(int)floor(ep[5]);
-        time.time=(time_t)days*86400+(int)ep[3]*3600+(int)ep[4]*60+sec;
+        sec=(int)Math.floor(ep[5]);
+        time.time=(Instant) days*86400+(int)ep[3]*3600+(int)ep[4]*60+sec;
         time.sec=ep[5]-sec;
         return time;
     }
+
     /* time to calendar day/time ---------------------------------------------------
      * convert gtime_t struct to calendar day/time
      * args   : gtime_t t        I   gtime_t struct
@@ -1208,12 +1228,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : none
      * notes  : proper in 1970-2037 or 1970-2099 (64bit time_t)
      *-----------------------------------------------------------------------------*/
-    public static void time2epoch(gtime_t t, double *ep)
+    public static void time2epoch(rtklib.gtime_t t, Double[] ep)
     {
-    final int mday[]={ /* # of days in a month */
+        final int mday[]={ /* # of days in a month */
             31,28,31,30,31,30,31,31,30,31,30,31,31,28,31,30,31,30,31,31,30,31,30,31,
             31,29,31,30,31,30,31,31,30,31,30,31,31,28,31,30,31,30,31,31,30,31,30,31
-    };
+        };
         int days,sec,mon,day;
 
         /* leap year if year%4==0 in 1901-2099 */
@@ -1222,16 +1242,21 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         for (day=days%1461,mon=0;mon<48;mon++) {
             if (day>=mday[mon]) day-=mday[mon]; else break;
         }
-        ep[0]=1970+days/1461*4+mon/12; ep[1]=mon%12+1; ep[2]=day+1;
-        ep[3]=sec/3600; ep[4]=sec%3600/60; ep[5]=sec%60+t.sec;
+        ep[0]=(double)(1970+days/1461*4+mon/12);
+        ep[1]=(double)(mon%12+1);
+        ep[2]=(double)(day+1);
+        ep[3]=(double)(sec/3600);
+        ep[4]=(double)(sec%3600/60);
+        ep[5]=(double)(sec%60+t.sec);
     }
+
     /* gps time to time ------------------------------------------------------------
      * convert week and tow in gps time to gtime_t struct
      * args   : int    week      I   week number in gps time
      *          double sec       I   time of week in gps time (s)
      * return : gtime_t struct
      *-----------------------------------------------------------------------------*/
-    public static gtime_t gpst2time(int week, double sec)
+    public static rtklib.gtime_t gpst2time(int week, double sec)
     {
         rtklib.gtime_t t=epoch2time(gpst0);
 
@@ -1240,21 +1265,25 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         t.sec=sec-(int)sec;
         return t;
     }
+
     /* time to gps time ------------------------------------------------------------
      * convert gtime_t struct to week and tow in gps time
      * args   : gtime_t t        I   gtime_t struct
      *          int    *week     IO  week number in gps time (NULL: no output)
      * return : time of week in gps time (s)
      *-----------------------------------------------------------------------------*/
-    public static double time2gpst(gtime_t t, int *week)
+    public static double time2gpst(rtklib.gtime_t t, Integer week)
     {
         rtklib.gtime_t t0=epoch2time(gpst0);
         time_t sec=t.time-t0.time;
         int w=(int)(sec/(86400*7));
 
-        if (week) *week=w;
+        if (week != null)
+            week=w;
+
         return (double)(sec-(double)w*86400*7)+t.sec;
     }
+
     /* galileo system time to time -------------------------------------------------
      * convert week and tow in galileo system time (gst) to gtime_t struct
      * args   : int    week      I   week number in gst
@@ -1270,13 +1299,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         t.sec=sec-(int)sec;
         return t;
     }
+
     /* time to galileo system time -------------------------------------------------
      * convert gtime_t struct to week and tow in galileo system time (gst)
      * args   : gtime_t t        I   gtime_t struct
      *          int    *week     IO  week number in gst (NULL: no output)
      * return : time of week in gst (s)
      *-----------------------------------------------------------------------------*/
-    public static double time2gst(rtklib.gtime_t t, int *week)
+    public static double time2gst(rtklib.gtime_t t, Integer week)
     {
         rtklib.gtime_t t0=epoch2time(gst0);
         time_t sec=t.time-t0.time;
@@ -1285,6 +1315,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         if (week) *week=w;
         return (double)(sec-(double)w*86400*7)+t.sec;
     }
+
     /* beidou time (bdt) to time ---------------------------------------------------
      * convert week and tow in beidou time (bdt) to gtime_t struct
      * args   : int    week      I   week number in bdt
@@ -1300,13 +1331,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         t.sec=sec-(int)sec;
         return t;
     }
+
     /* time to beidouo time (bdt) --------------------------------------------------
      * convert gtime_t struct to week and tow in beidou time (bdt)
      * args   : gtime_t t        I   gtime_t struct
      *          int    *week     IO  week number in bdt (NULL: no output)
      * return : time of week in bdt (s)
      *-----------------------------------------------------------------------------*/
-    public static double time2bdt(rtklib.gtime_t t, int *week)
+    public static double time2bdt(rtklib.gtime_t t, Integer week)
     {
         rtklib.gtime_t t0=epoch2time(bdt0);
         time_t sec=t.time-t0.time;
@@ -1315,6 +1347,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         if (week) *week=w;
         return (double)(sec-(double)w*86400*7)+t.sec;
     }
+
     /* add time --------------------------------------------------------------------
      * add time to gtime_t struct
      * args   : gtime_t t        I   gtime_t struct
@@ -1328,6 +1361,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         t.sec+=sec; tt=Math.floor(t.sec); t.time+=(int)tt; t.sec-=tt;
         return t;
     }
+
     /* time difference -------------------------------------------------------------
      * difference between gtime_t structs
      * args   : gtime_t t1,t2    I   gtime_t structs
@@ -1337,6 +1371,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     {
         return difftime(t1.time,t2.time)+t1.sec-t2.sec;
     }
+
     /* get current time in utc -----------------------------------------------------
      * get current time in utc
      * args   : none
@@ -1400,13 +1435,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         return n;
     }
     /* read leap seconds table by usno -------------------------------------------*/
-    static int read_leaps_usno(File *fp)
+    static int read_leaps_usno(File fp)
     {
-        static final char *months[]={
-        "JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"
-    };
+        static final char[] months={
+        "JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"};
         double jd,tai_utc;
-        char buff[256],month[32],ls[rtklib.MAXLEAPS][7]={{0}};
+        char[] buff = new char[256];
+        char[] month = new char[32];
+        char[] ls[rtklib.MAXLEAPS][7]={{0}};
         int i,j,y,m,d,n=0;
 
         rewind(fp);
@@ -1471,6 +1507,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         }
         return t;
     }
+
     /* utc to gpstime --------------------------------------------------------------
      * convert utc to gpstime considering leap seconds
      * args   : gtime_t t        I   time expressed in utc
@@ -1486,6 +1523,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         }
         return t;
     }
+
     /* gpstime to bdt --------------------------------------------------------------
      * convert gpstime to bdt (beidou navigation satellite system time)
      * args   : gtime_t t        I   time expressed in gpstime
@@ -1508,16 +1546,19 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     {
         return timeadd(t,14.0);
     }
+
     /* time to day and sec -------------------------------------------------------*/
-    static double time2sec(rtklib.gtime_t time, rtklib.gtime_t *day)
+    static double time2sec(rtklib.gtime_t time, rtklib.gtime_t day)
     {
-        double ep[6],sec;
+        double[] ep = new double[6];
+        double sec;
         time2epoch(time,ep);
         sec=ep[3]*3600.0+ep[4]*60.0+ep[5];
         ep[3]=ep[4]=ep[5]=0.0;
-    *day=epoch2time(ep);
+        day=epoch2time(ep);
         return sec;
     }
+
     /* utc to gmst -----------------------------------------------------------------
      * convert utc to gmst (Greenwich mean sidereal time)
      * args   : gtime_t t        I   time expressed in utc
@@ -1537,8 +1578,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         gmst0=24110.54841+8640184.812866*t1+0.093104*t2-6.2E-6*t3;
         gmst=gmst0+1.002737909350795*ut;
 
-        return fmod(gmst,86400.0)*rtklib.PI/43200.0; /* 0 <= gmst <= 2*PI */
+        return Math.fmod(gmst,86400.0)*rtklib.PI/43200.0; /* 0 <= gmst <= 2*PI */
     }
+
     /* time to string --------------------------------------------------------------
      * convert gtime_t struct to string
      * args   : gtime_t t        I   gtime_t struct
@@ -1546,16 +1588,17 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          int    n         I   number of decimals
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void time2str(rtklib.gtime_t t, char *s, int n)
+    public static void time2str(rtklib.gtime_t t, String s, int n)
     {
-        double ep[6];
+        double[] ep = new double[6];
 
         if (n<0) n=0; else if (n>12) n=12;
         if (1.0-t.sec<0.5/Math.pow(10.0,n)) {t.time++; t.sec=0.0;};
         time2epoch(t,ep);
-        sprintf(s,"%04.0f/%02.0f/%02.0f %02.0f:%02.0f:%0*.*f",ep[0],ep[1],ep[2],
+        String.format(s,"%04.0f/%02.0f/%02.0f %02.0f:%02.0f:%0*.*f",ep[0],ep[1],ep[2],
                 ep[3],ep[4],n<=0?2:n+3,n<=0?0:n,ep[5]);
     }
+
     /* get time string -------------------------------------------------------------
      * get time string
      * args   : gtime_t t        I   gtime_t struct
@@ -1601,26 +1644,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static long tickget(void)
     {
-#ifdef WIN32
-        return (unsigned int)timeGetTime();
-#else
-        struct timespec tp={0};
-        struct timeval  tv={0};
+        return 0;
 
-#ifdef CLOCK_MONOTONIC_RAW
-        /* linux kernel > 2.6.28 */
-        if (!clock_gettime(CLOCK_MONOTONIC_RAW,&tp)) {
-        return tp.tv_sec*1000u+tp.tv_nsec/1000000u;
-    }
-    else {
-        gettimeofday(&tv,NULL);
-        return tv.tv_sec*1000u+tv.tv_usec/1000u;
-    }
-#else
-        gettimeofday(&tv,NULL);
-        return tv.tv_sec*1000u+tv.tv_usec/1000u;
-#endif
-#endif /* WIN32 */
     }
     /* sleep ms --------------------------------------------------------------------
      * sleep ms
@@ -1629,16 +1654,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void sleepms(int ms)
     {
-#ifdef WIN32
-        if (ms<5) Sleep(1); else Sleep(ms);
-#else
-        struct timespec ts;
-        if (ms<=0) return;
-        ts.tv_sec=(time_t)(ms/1000);
-        ts.tv_nsec=(long)(ms%1000*1000000);
-        nanosleep(&ts,NULL);
-#endif
+
     }
+
     /* convert degree to deg-min-sec -----------------------------------------------
      * convert degree to degree-minute-second
      * args   : double deg       I   degree
@@ -1646,9 +1664,9 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          int    ndec      I   number of decimals of second
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void deg2dms(double deg, double *dms, int ndec)
+    public static void deg2dms(double deg, Double[] dms, int ndec)
     {
-        double sign=deg<0.0?-1.0:1.0,a=fabs(deg);
+        double sign=deg<0.0?-1.0:1.0,a=Math.abs(deg);
         double unit=Math.pow(0.1,ndec);
         dms[0]=Math.floor(a); a=(a-dms[0])*60.0;
         dms[1]=Math.floor(a); a=(a-dms[1])*60.0;
@@ -1663,16 +1681,18 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         }
         dms[0]*=sign;
     }
+
     /* convert deg-min-sec to degree -----------------------------------------------
      * convert degree-minute-second to degree
      * args   : double *dms      I   degree-minute-second {deg,min,sec}
      * return : degree
      *-----------------------------------------------------------------------------*/
-    public static double dms2deg(final double *dms)
+    public static double dms2deg(final Double[] dms)
     {
         double sign=dms[0]<0.0?-1.0:1.0;
         return sign*(Math.abs(dms[0])+dms[1]/60.0+dms[2]/3600.0);
     }
+
     /* transform ecef to geodetic postion ------------------------------------------
      * transform ecef position to geodetic position
      * args   : double *r        I   ecef position {x,y,z} (m)
@@ -1680,20 +1700,24 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : none
      * notes  : WGS84, ellipsoidal height
      *-----------------------------------------------------------------------------*/
-    public static void ecef2pos(final double *r, double *pos)
+    public static void ecef2pos(final Double[] r, Double[] pos)
     {
-        double e2=rtklib.FE_WGS84*(2.0-rtklib.FE_WGS84),r2=dot(r,r,2),z,zk,v=rtklib.RE_WGS84,sinp;
+        double e2=rtklib.FE_WGS84*(2.0-rtklib.FE_WGS84);
+        double r2=dot(r,r,2);
+        double z,zk,v=rtklib.RE_WGS84;
+        double sinp;
 
-        for (z=r[2],zk=0.0;fabs(z-zk)>=1E-4;) {
+        for (z=r[2],zk=0.0;Math.abs(z-zk)>=1E-4;) {
             zk=z;
-            sinp=z/sqrt(r2+z*z);
-            v=rtklib.RE_WGS84/sqrt(1.0-e2*sinp*sinp);
+            sinp=z/Math.sqrt(r2+z*z);
+            v=rtklib.RE_WGS84/Math.sqrt(1.0-e2*sinp*sinp);
             z=r[2]+v*e2*sinp;
         }
-        pos[0]=r2>1E-12?atan(z/sqrt(r2)):(r[2]>0.0?rtklib.PI/2.0:-rtklib.PI/2.0);
-        pos[1]=r2>1E-12?atan2(r[1],r[0]):0.0;
+        pos[0]=r2>1E-12?Math.atan(z/Math.sqrt(r2)):(r[2]>0.0?rtklib.PI/2.0:-rtklib.PI/2.0);
+        pos[1]=r2>1E-12?Math.atan2(r[1],r[0]):0.0;
         pos[2]=Math.sqrt(r2+z*z)-v;
     }
+
     /* transform geodetic to ecef position -----------------------------------------
      * transform geodetic position to ecef position
      * args   : double *pos      I   geodetic position {lat,lon,h} (rad,m)
@@ -1701,7 +1725,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : none
      * notes  : WGS84, ellipsoidal height
      *-----------------------------------------------------------------------------*/
-    public static void pos2ecef(final double *pos, double *r)
+    public static void pos2ecef(final Double[] pos, Double[] r)
     {
         double sinp=Math.sin(pos[0]),cosp=Math.cos(pos[0]),sinl=Math.sin(pos[1]),cosl=Math.cos(pos[1]);
         double e2=rtklib.FE_WGS84*(2.0-rtklib.FE_WGS84),v=rtklib.RE_WGS84/Math.sqrt(1.0-e2*sinp*sinp);
@@ -1710,6 +1734,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         r[1]=(v+pos[2])*cosp*sinl;
         r[2]=(v*(1.0-e2)+pos[2])*sinp;
     }
+
     /* ecef to local coordinate transfromation matrix ------------------------------
      * compute ecef to local coordinate transfromation matrix
      * args   : double *pos      I   geodetic position {lat,lon} (rad)
@@ -1717,7 +1742,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : none
      * notes  : matirix stored by column-major order (fortran convention)
      *-----------------------------------------------------------------------------*/
-    public static void xyz2enu(final double *pos, double *E)
+    public static void xyz2enu(final Double[] pos, Double[] E)
     {
         double sinp=Math.sin(pos[0]),cosp=Math.cos(pos[0]),sinl=Math.sin(pos[1]),cosl=Math.cos(pos[1]);
 
@@ -1725,6 +1750,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         E[1]=-sinp*cosl; E[4]=-sinp*sinl; E[7]=cosp;
         E[2]=cosp*cosl;  E[5]=cosp*sinl;  E[8]=sinp;
     }
+
     /* transform ecef vector to local tangental coordinate -------------------------
      * transform ecef vector to local tangental coordinate
      * args   : double *pos      I   geodetic position {lat,lon} (rad)
@@ -1732,13 +1758,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double *e        O   vector in local tangental coordinate {e,n,u}
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void ecef2enu(final double *pos, final double *r, double *e)
+    public static void ecef2enu(final Double[] pos, final Double[] r, Double[] e)
     {
-        double E[9];
+        Double[] E = new Double[9];
 
         xyz2enu(pos,E);
         matmul("NN",3,1,3,1.0,E,r,0.0,e);
     }
+
     /* transform local vector to ecef coordinate -----------------------------------
      * transform local tangental coordinate vector to ecef
      * args   : double *pos      I   geodetic position {lat,lon} (rad)
@@ -1746,13 +1773,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double *r        O   vector in ecef coordinate {x,y,z}
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void enu2ecef(final double *pos, final double *e, double *r)
+    public static void enu2ecef(final Double[] pos, final Double[] e, Double[] r)
     {
-        double E[9];
+        Double[] E = new Double[9];
 
         xyz2enu(pos,E);
         matmul("TN",3,1,3,1.0,E,e,0.0,r);
     }
+
     /* transform covariance to local tangental coordinate --------------------------
      * transform ecef covariance to local tangental coordinate
      * args   : double *pos      I   geodetic position {lat,lon} (rad)
@@ -1760,14 +1788,16 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double *Q        O   covariance in local tangental coordinate
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void covenu(final double *pos, final double *P, double *Q)
+    public static void covenu(final Double[] pos, final Double[] P, Double[] Q)
     {
-        double E[9],EP[9];
+        Double[] E = new Double[9];
+        Double[] EP = new Double[9];
 
         xyz2enu(pos,E);
         matmul("NN",3,3,3,1.0,E,P,0.0,EP);
         matmul("NT",3,3,3,1.0,EP,E,0.0,Q);
     }
+
     /* transform local enu coordinate covariance to xyz-ecef -----------------------
      * transform local enu covariance to xyz-ecef coordinate
      * args   : double *pos      I   geodetic position {lat,lon} (rad)
@@ -1775,14 +1805,16 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double *P        O   covariance in xyz-ecef coordinate
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void covecef(final double *pos, final double *Q, double *P)
+    public static void covecef(final Double[] pos, final Double[] Q, Double[] P)
     {
-        double E[9],EQ[9];
+        Double[] E = new Double[9];
+        Double[] EQ = new Double[9];
 
         xyz2enu(pos,E);
         matmul("TN",3,3,3,1.0,E,Q,0.0,EQ);
         matmul("NN",3,3,3,1.0,EQ,E,0.0,P);
     }
+
     /* coordinate rotation matrix ------------------------------------------------*/
 #define Rx(t,X) do { \
         (X)[0]=1.0; (X)[1]=(X)[2]=(X)[3]=(X)[6]=0.0; \
@@ -1819,10 +1851,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             f[i]=fmod(f[i]*AS2R,2.0*PI);
         }
     }
+
     /* iau 1980 nutation ---------------------------------------------------------*/
-    static void nut_iau1980(double t, final double *f, double *dpsi, double *deps)
+    static void nut_iau1980(double t, final Double[] f, Double[] dpsi, Double[] deps)
     {
-        static final double nut[106][10]={
+        // Sizes nut[106][10]
+        final double[][] nut = {
         {   0,   0,   0,   0,   1, -6798.4, -171996, -174.2, 92025,   8.9},
         {   0,   0,   2,  -2,   2,   182.6,  -13187,   -1.6,  5736,  -3.1},
         {   0,   0,   2,   0,   2,    13.7,   -2274,   -0.2,   977,  -0.5},
@@ -1933,17 +1967,19 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         double ang;
         int i,j;
 
-    *dpsi=*deps=0.0;
+        dpsi=deps=0.0;
 
         for (i=0;i<106;i++) {
             ang=0.0;
             for (j=0;j<5;j++) ang+=nut[i][j]*f[j];
-        *dpsi+=(nut[i][6]+nut[i][7]*t)*sin(ang);
-        *deps+=(nut[i][8]+nut[i][9]*t)*cos(ang);
+                *dpsi+=(nut[i][6]+nut[i][7]*t)*Math.sin(ang);
+                *deps+=(nut[i][8]+nut[i][9]*t)*Math.cos(ang);
         }
-    *dpsi*=1E-4*AS2R; /* 0.1 mas . rad */
-    *deps*=1E-4*AS2R;
+
+        *dpsi*=1E-4*rtklib.AS2R; /* 0.1 mas . rad */
+        *deps*=1E-4*rtklib.AS2R;
     }
+
     /* eci to ecef transformation matrix -------------------------------------------
      * compute eci to ecef transformation matrix
      * args   : gtime_t tutc     I   time in utc
@@ -1957,17 +1993,18 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void eci2ecef(rtklib.gtime_t tutc, final double[] erpv, Double U, Double gmst)
     {
-    final double ep2000[]={2000,1,1,12,0,0};
-        static gtime_t tutc_;
-        static double U_[9],gmst_;
-        gtime_t tgps;
+        final double ep2000[]={2000,1,1,12,0,0};
+        static rtklib.gtime_t tutc_;
+        static double U_[9];
+        static double gmst_;
+        rtklib.gtime_t tgps;
         double eps,ze,th,z,t,t2,t3,dpsi,deps,gast,f[5];
         double R1[9],R2[9],R3[9],R[9],W[9],N[9],P[9],NP[9];
         int i;
 
         trace(4,"eci2ecef: tutc=%s\n",time_str(tutc,3));
 
-        if (fabs(timediff(tutc,tutc_))<0.01) { /* read cache */
+        if (Math.abs(timediff(tutc,tutc_))<0.01) { /* read cache */
             for (i=0;i<9;i++) U[i]=U_[i];
             if (gmst) *gmst=gmst_;
             return;
@@ -2444,6 +2481,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
                 (q1.toe.time!=q2.toe.time?(int)(q1.toe.time-q2.toe.time):
                         q1.sat-q2.sat);
     }
+
     /* sort and unique ephemeris -------------------------------------------------*/
     static void uniqeph(rtklib.nav_t nav)
     {
@@ -2476,9 +2514,10 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     }
 
     /* compare glonass ephemeris -------------------------------------------------*/
-    static int cmpgeph(final void *p1, final void *p2)
+    static int cmpgeph(final rtklib.geph_t p1, final rtklib.geph_t p2)
     {
-        geph_t *q1=(geph_t *)p1,*q2=(geph_t *)p2;
+        rtklib.geph_t q1 = p1;
+        rtklib.geph_t q2 = p2;
         return q1.tof.time!=q2.tof.time?(int)(q1.tof.time-q2.tof.time):
                 (q1.toe.time!=q2.toe.time?(int)(q1.toe.time-q2.toe.time):
                         q1.sat-q2.sat);
@@ -2515,18 +2554,20 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         trace(4,"uniqgeph: ng=%d\n",nav.ng);
     }
+
     /* compare sbas ephemeris ----------------------------------------------------*/
-    static int cmpseph(final void *p1, final void *p2)
+    static int cmpseph(final rtklib.seph_t p1, final rtklib.seph_t p2)
     {
-        seph_t *q1=(seph_t *)p1,*q2=(seph_t *)p2;
+        rtklib.seph_t q1 = p1;
+        rtklib.seph_t q2 = p2;
         return q1.tof.time!=q2.tof.time?(int)(q1.tof.time-q2.tof.time):
                 (q1.t0.time!=q2.t0.time?(int)(q1.t0.time-q2.t0.time):
                         q1.sat-q2.sat);
     }
     /* sort and unique sbas ephemeris --------------------------------------------*/
-    static void uniqseph(nav_t *nav)
+    static void uniqseph(rtklib.nav_t nav)
     {
-        seph_t *nav_seph;
+        rtklib.seph_t nav_seph;
         int i,j;
 
         trace(3,"uniqseph: ns=%d\n",nav.ns);
@@ -2570,16 +2611,18 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         uniqseph(nav);
 
         /* update carrier wave length */
-        for (i=0;i<rtklib.MAXSAT;i++) for (j=0;j<NFREQ;j++) {
+        for (i=0;i<rtklib.MAXSAT;i++) for (j=0;j<rtklib.NFREQ;j++) {
             nav.lam[i][j]=satwavelen(i+1,j,nav);
         }
     }
+
     /* compare observation data -------------------------------------------------*/
-    static int cmpobs(final void *p1, final void *p2)
+    static int cmpobs(final rtklib.obsd_t p1, final rtklib.obsd_t p2)
     {
-        obsd_t *q1=(obsd_t *)p1,*q2=(obsd_t *)p2;
+        rtklib.obsd_t q1=p1;
+        rtklib.obsd_t q2=p2;
         double tt=timediff(q1.time,q2.time);
-        if (fabs(tt)>DTTOL) return tt<0?-1:1;
+        if (Math.abs(tt)>DTTOL) return tt<0?-1:1;
         if (q1.rcv!=q2.rcv) return (int)q1.rcv-(int)q2.rcv;
         return (int)q1.sat-(int)q2.sat;
     }
