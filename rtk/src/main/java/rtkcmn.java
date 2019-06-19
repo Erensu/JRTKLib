@@ -2371,17 +2371,18 @@ final String[] formatstrs = new String[]{    /* stream format strings */
                 }
                 erp.data=erp_data;
             }
-            erp.data[erp.n].mjd=v[0];
-            erp.data[erp.n].xp=v[1]*1E-6*AS2R;
-            erp.data[erp.n].yp=v[2]*1E-6*AS2R;
-            erp.data[erp.n].ut1_utc=v[3]*1E-7;
-            erp.data[erp.n].lod=v[4]*1E-7;
-            erp.data[erp.n].xpr=v[12]*1E-6*AS2R;
-            erp.data[erp.n++].ypr=v[13]*1E-6*AS2R;
+            erp.data.get(erp.n).mjd=v[0];
+            erp.data.get(erp.n).xp=v[1]*1E-6*AS2R;
+            erp.data.get(erp.n).yp=v[2]*1E-6*AS2R;
+            erp.data.get(erp.n).ut1_utc=v[3]*1E-7;
+            erp.data.get(erp.n).lod=v[4]*1E-7;
+            erp.data.get(erp.n).xpr=v[12]*1E-6*AS2R;
+            erp.data.get(erp.n).ypr=v[13]*1E-6*AS2R;
         }
         fclose(fp);
         return 1;
     }
+
     /* get earth rotation parameter values -----------------------------------------
      * get earth rotation parameter values
      * args   : erp_t  *erp        I   earth rotation parameters
@@ -2433,10 +2434,12 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         erpv[3]=(1.0-a)*erp.data.get(j).lod    +a*erp.data.get(j+1).lod;
         return 1;
     }
+
     /* compare ephemeris ---------------------------------------------------------*/
-    static int cmpeph(final void *p1, final void *p2)
+    static int cmpeph(final rtklib.eph_t p1, final rtklib.eph_t p2)
     {
-        eph_t *q1=(eph_t *)p1,*q2=(eph_t *)p2;
+        rtklib.eph_t q1 = p1;
+        rtklib.eph_t q2 = p2;
         return q1.ttr.time!=q2.ttr.time?(int)(q1.ttr.time-q2.ttr.time):
                 (q1.toe.time!=q2.toe.time?(int)(q1.toe.time-q2.toe.time):
                         q1.sat-q2.sat);
@@ -2461,7 +2464,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         }
         nav.n=j+1;
 
-        if (!(nav_eph=(eph_t *)realloc(nav.eph,sizeof(eph_t)*nav.n))) {
+        if (!(nav_eph=(rtklib.eph_t *)realloc(nav.eph,sizeof(eph_t)*nav.n))) {
         trace(1,"uniqeph malloc error n=%d\n",nav.n);
         free(nav.eph); nav.eph=NULL; nav.n=nav.nmax=0;
         return;
@@ -2471,6 +2474,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         trace(4,"uniqeph: n=%d\n",nav.n);
     }
+
     /* compare glonass ephemeris -------------------------------------------------*/
     static int cmpgeph(final void *p1, final void *p2)
     {
@@ -2479,6 +2483,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
                 (q1.toe.time!=q2.toe.time?(int)(q1.toe.time-q2.toe.time):
                         q1.sat-q2.sat);
     }
+
     /* sort and unique glonass ephemeris -----------------------------------------*/
     static void uniqgeph(rtklib.nav_t nav)
     {
