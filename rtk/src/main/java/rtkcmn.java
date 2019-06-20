@@ -51,7 +51,7 @@
  *                          fix bug of seasonal variation term of tropmapf
  *           2008/12/27 1.6 add function tickget(), sleepms(), tracenav(),
  *                          xyz2enu(), satposv(), pntvel(), covecef()
- *           2009/03/12 1.7 fix bug on error-stop when localtime() returns NULL
+ *           2009/03/12 1.7 fix bug on error-stop when localtime() returns null
  *           2009/03/13 1.8 fix bug on time adjustment for summer time
  *           2009/04/10 1.9 add function adjgpsweek(),getbits(),getbitu()
  *                          add function geph2pos()
@@ -407,7 +407,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     /* satellite number to satellite system ----------------------------------------
      * convert satellite number to satellite system
      * args   : int    sat       I   satellite number (1-rtklib.MAXSAT)
-     *          int    *prn      IO  satellite prn/slot number (NULL: no output)
+     *          int    *prn      IO  satellite prn/slot number (null: no output)
      * return : satellite system (rtklib.SYS_GPS,rtklib.SYS_GLO,...)
      *-----------------------------------------------------------------------------*/
     public static int satsys(int sat, Integer prn)
@@ -502,7 +502,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * args   : int    sat       I   satellite number
      *          double var       I   variance of ephemeris (m^2)
      *          int    svh       I   sv health flag
-     *          prcopt_t *opt    I   processing options (NULL: not used)
+     *          prcopt_t *opt    I   processing options (null: not used)
      * return : status (1:excluded,0:not excluded)
      *-----------------------------------------------------------------------------*/
     public static int satexclude(int sat, double var, int svh, final rtklib.prcopt_t opt)
@@ -556,7 +556,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * convert obs code type string to obs code
      * args   : char   *str   I      obs code string ("1C","1P","1Y",...)
      *          int    *freq  IO     frequency (1:L1,2:L2,3:L5,4:L6,5:L7,6:L8,0:err)
-     *                               (NULL: no output)
+     *                               (null: no output)
      * return : obs code (CODE_???)
      * notes  : obs codes are based on reference [6] and qzss extension
      *-----------------------------------------------------------------------------*/
@@ -580,7 +580,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 /* obs code to obs code string -------------------------------------------------
 * convert obs code to obs code string
 * args   : unsigned char code I obs code (CODE_???)
-*          int    *freq  IO     frequency (NULL: no output)
+*          int    *freq  IO     frequency (null: no output)
 *                               (1:L1/E1, 2:L2/B1, 3:L5/E5a/L3, 4:L6/LEX/B3,
                                  5:E5b/B2, 6:E5(a+b), 7:S)
 * return : obs code string ("1C","1P","1P",...)
@@ -618,7 +618,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * get code priority for multiple codes in a frequency
      * args   : int    sys     I     system (rtklib.SYS_???)
      *          unsigned char code I obs code (CODE_???)
-     *          char   *opt    I     code options (NULL:no option)
+     *          char   *opt    I     code options (null:no option)
      * return : priority (15:highest-1:lowest,0:error)
      *-----------------------------------------------------------------------------*/
     public static int getcodepri(int sys, short code, final String opt)
@@ -779,96 +779,119 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         for (i=0;i<3;i++) data[i]=(short)(word>>(22-i*8));
         return 1;
     }
+
     /* new matrix ------------------------------------------------------------------
      * allocate memory of matrix
      * args   : int    n,m       I   number of rows and columns of matrix
-     * return : matrix pointer (if n<=0 or m<=0, return NULL)
+     * return : matrix pointer (if n<=0 or m<=0, return null)
      *-----------------------------------------------------------------------------*/
-    public static RealMatrix mat(int n, int m)
+    public static Double[] mat(int n, int m)
     {
-        if (n<=0||m<=0) return null;
-        RealMatrix p = new Array2DRowRealMatrix(n, m);
-        if (p == null) {
+        Double[] p = null;
+
+        if (n<=0||m<=0)
+            return null;
+
+        try{
+            p = new Double[n*m];
+        }catch (Exception e){
             fatalerr("matrix memory allocation error: n=%d,m=%d\n",n,m);
         }
+
         return p;
     }
+
     /* new integer matrix ----------------------------------------------------------
      * allocate memory of integer matrix
      * args   : int    n,m       I   number of rows and columns of matrix
-     * return : matrix pointer (if n<=0 or m<=0, return NULL)
+     * return : matrix pointer (if n<=0 or m<=0, return null)
      *-----------------------------------------------------------------------------*/
-    public static RealMatrix imat(int n, int m)
+    public static Integer[] imat(int n, int m)
     {
-        if (n<=0||m<=0) return null;
-        RealMatrix p = new Array2DRowRealMatrix(n, m);
-        if (p == null) {
-            fatalerr("integer matrix memory allocation error: n=%d,m=%d\n", n, m);
+        Integer[] p = null;
+
+        if (n<=0||m<=0)
+            return null;
+
+        try{
+            p = new Integer[n*m];
+        }catch (Exception e){
+            fatalerr("integer memory allocation error: n=%d,m=%d\n",n,m);
         }
+
         return p;
     }
+
     /* zero matrix -----------------------------------------------------------------
      * generate new zero matrix
      * args   : int    n,m       I   number of rows and columns of matrix
-     * return : matrix pointer (if n<=0 or m<=0, return NULL)
+     * return : matrix pointer (if n<=0 or m<=0, return null)
      *-----------------------------------------------------------------------------*/
-    public static RealMatrix zeros(int n, int m)
+    public static Double[] zeros(int n, int m)
     {
-        if (n<=0||m<=0) return null;
-        RealMatrix p = MatrixUtils.createRealMatrix(n, m);
-        if (p == null) {
-            fatalerr("matrix memory allocation error: n=%d,m=%d\n",n,m);
+        Double[] p;
+
+        if ((p=mat(n,m)) != null) {
+            for (n = n * m - 1; n >= 0; n--)
+                p[n] = 0.0;
         }
+
         return p;
     }
+
     /* identity matrix -------------------------------------------------------------
      * generate new identity matrix
      * args   : int    n         I   number of rows and columns of matrix
-     * return : matrix pointer (if n<=0, return NULL)
+     * return : matrix pointer (if n<=0, return null)
      *-----------------------------------------------------------------------------*/
-    public static RealMatrix eye(int n)
+    public static Double[] eye(int n)
     {
-        if (n<=0) return null;
-        RealMatrix p = MatrixUtils.createRealIdentityMatrix(n);
-        if (p == null) {
-            fatalerr("matrix memory allocation error: n=%d\n",n);
+        Double[] p;
+        int i;
+
+        if ((p=zeros(n,n)) != null) {
+            for (i = 0; i < n; i++)
+                p[i + i * n] = 1.0;
         }
-        return p;
+
+         return p;
     }
+
     /* inner product ---------------------------------------------------------------
      * inner product of vectors
      * args   : double *a,*b     I   vector a,b (n x 1)
      *          int    n         I   size of vector a,b
      * return : a'*b
      *-----------------------------------------------------------------------------*/
-    public static double dot(final RealVector a, final RealVector b, int n)
+    public static Double dot(final Double[] a, final Double[] b, int n)
     {
-        double c;
+        double c=0.0;
 
-        c = a.dotProduct(b);
+        while (--n>=0)
+            c+=a[n]*b[n];
 
         return c;
     }
+
     /* euclid norm -----------------------------------------------------------------
      * euclid norm of vector
      * args   : double *a        I   vector a (n x 1)
      *          int    n         I   size of vector a
      * return : || a ||
      *-----------------------------------------------------------------------------*/
-    public static double norm(final RealVector a, int n)
+    public static double norm(final Double[] a, int n)
     {
-        // The L2 norm is equivalent to the Euclidean norm
-        return a.getNorm();
+        return Math.sqrt(dot(a,a,n));
     }
+
     /* outer product of 3d vectors -------------------------------------------------
      * outer product of 3d vectors
      * args   : double *a,*b     I   vector a,b (3 x 1)
      *          double *c        O   outer product (a x b) (3 x 1)
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void cross3(final RealVector a, final RealVector b, RealVector c)
+    public static void cross3(final Double[] a, final Double[] b, Double[] c)
     {
-        Vector3D.crossProduct()
         c[0]=a[1]*b[2]-a[2]*b[1];
         c[1]=a[2]*b[0]-a[0]*b[2];
         c[2]=a[0]*b[1]-a[1]*b[0];
@@ -880,14 +903,13 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double *b        O   normlized vector (3 x 1) || b || = 1
      * return : status (1:ok,0:error)
      *-----------------------------------------------------------------------------*/
-    public static int normv3(final RealVector a, RealVector b)
+    public static int normv3(final Double[] a, Double[] b)
     {
-        int n = a.getDimension();
-        double r = norm(a, n);
-
-        if (r<=0.0) return 0;
-
-        b = a.mapDivide(r);
+        double r;
+        if ((r=norm(a,3))<=0.0) return 0;
+        b[0]=a[0]/r;
+        b[1]=a[1]/r;
+        b[2]=a[2]/r;
         return 1;
     }
 
@@ -898,7 +920,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          int    n,m       I   number of rows and columns of matrix
      * return : none
      *-----------------------------------------------------------------------------*/
-    public static void matcpy(RealMatrix A, final RealMatrix B, int n, int m)
+    public static void matcpy(Double[] A, final Double[] B, int n, int m)
     {
         A = B;
     }
@@ -906,8 +928,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
 
     /* multiply matrix -----------------------------------------------------------*/
-    public static void matmul(final char *tr, int n, int k, int m, double alpha,
-                   final double *A, final double *B, double beta, double *C)
+    public static void matmul(final char [] tr, int n, int k, int m, double alpha,
+                   final Double[] A, final Double[] B, double beta, Double[] C)
     {
         double d;
         int i,j,x,f=tr[0]=='N'?(tr[1]=='N'?1:2):(tr[1]=='N'?3:4);
@@ -923,25 +945,43 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             if (beta==0.0) C[i+j*n]=alpha*d; else C[i+j*n]=alpha*d+beta*C[i+j*n];
         }
     }
+
     /* LU decomposition ----------------------------------------------------------*/
-    static int ludcmp(double *A, int n, int *indx, double *d)
+    static int ludcmp(Double[] A, int n, Integer[] indx, Double[] d)
     {
-        double big,s,tmp,*vv=mat(n,1);
+        double big,s,tmp;
+        Double[] vv=mat(n,1);
         int i,imax=0,j,k;
 
-    *d=1.0;
+        d[0] = 1.0;
         for (i=0;i<n;i++) {
-            big=0.0; for (j=0;j<n;j++) if ((tmp=fabs(A[i+j*n]))>big) big=tmp;
-            if (big>0.0) vv[i]=1.0/big; else {free(vv); return -1;}
+            big=0.0;
+            for (j=0;j<n;j++)
+                if ((tmp=Math.abs(A[i+j*n]))>big)
+                    big=tmp;
+            if (big>0.0)
+                vv[i]=1.0/big;
+            else
+                return -1;
         }
+
         for (j=0;j<n;j++) {
             for (i=0;i<j;i++) {
-                s=A[i+j*n]; for (k=0;k<i;k++) s-=A[i+k*n]*A[k+j*n]; A[i+j*n]=s;
+                s=A[i+j*n];
+                for (k=0;k<i;k++)
+                    s-=A[i+k*n]*A[k+j*n];
+                A[i+j*n]=s;
             }
             big=0.0;
             for (i=j;i<n;i++) {
-                s=A[i+j*n]; for (k=0;k<j;k++) s-=A[i+k*n]*A[k+j*n]; A[i+j*n]=s;
-                if ((tmp=vv[i]*fabs(s))>=big) {big=tmp; imax=i;}
+                s=A[i+j*n];
+                for (k=0;k<j;k++)
+                    s-=A[i+k*n]*A[k+j*n];
+                A[i+j*n]=s;
+                if ((tmp=vv[i]*Math.abs(s))>=big){
+                    big=tmp;
+                    imax=i;
+                }
             }
             if (j!=imax) {
                 for (k=0;k<n;k++) {
@@ -950,16 +990,20 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             *d=-(*d); vv[imax]=vv[j];
             }
             indx[j]=imax;
-            if (A[j+j*n]==0.0) {free(vv); return -1;}
+            if (A[j+j*n]==0.0)
+                return -1;
             if (j!=n-1) {
-                tmp=1.0/A[j+j*n]; for (i=j+1;i<n;i++) A[i+j*n]*=tmp;
+                tmp=1.0/A[j+j*n];
+                for (i=j+1;i<n;i++)
+                    A[i+j*n]*=tmp;
             }
         }
-        free(vv);
+
         return 0;
     }
+
     /* LU back-substitution ------------------------------------------------------*/
-    static void lubksb(final double *A, int n, final int *indx, double *b)
+    public static void lubksb(final Double[] A, int n, final Integer[] indx, Double[] b)
     {
         double s;
         int i,ii=-1,ip,j;
@@ -973,32 +1017,42 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             s=b[i]; for (j=i+1;j<n;j++) s-=A[i+j*n]*b[j]; b[i]=s/A[i+i*n];
         }
     }
-    /* inverse of matrix ---------------------------------------------------------*/
-    public static int matinv(RealMatrix A, int n)
-    {
-        double d,*B;
-        int i,j,*indx;
 
-        indx=imat(n,1); B=mat(n,n); matcpy(B,A,n,n);
-        if (ludcmp(B,n,indx,&d)) {free(indx); free(B); return -1;}
+    /* inverse of matrix ---------------------------------------------------------*/
+    public static int matinv(Double[] A, int n)
+    {
+        double d;
+        Double[] B = new Double[];
+        int i,j;
+        Integer[] indx = new Integer[];
+
+        indx=imat(n,1);
+        B=mat(n,n);
+        matcpy(B,A,n,n);
+
+        if (ludcmp(B,n,indx,&d))
+            return -1;
         for (j=0;j<n;j++) {
-            for (i=0;i<n;i++) A[i+j*n]=0.0;
+            for (i=0;i<n;i++)
+                A[i+j*n]=0.0;
             A[j+j*n]=1.0;
-            lubksb(B,n,indx,A+j*n);
+            lubksb(B,n,indx,A[j*n]);
         }
-        free(indx); free(B);
+
         return 0;
     }
+
     /* solve linear equation -----------------------------------------------------*/
-    public static int solve(final char *tr, final double *A, final double *Y, int n,
-                     int m, double *X)
+    public static int solve(final char[] tr, final Double[] A, final Double[] Y, int n,
+                     int m, Double[] X)
     {
-        double *B=mat(n,n);
+        Double[] B=mat(n,n);
         int info;
 
         matcpy(B,A,n,n);
-        if (!(info=matinv(B,n))) matmul(tr[0]=='N'?"NN":"TN",n,m,n,1.0,B,Y,0.0,X);
-        free(B);
+        if ((info=matinv(B,n))==0)
+            matmul(tr[0]=='N'?"NN":"TN",n,m,n,1.0,B,Y,0.0,X);
+
         return info;
     }
     /* end of matrix routines ----------------------------------------------------*/
@@ -1014,19 +1068,24 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * notes  : for weighted least square, replace A and y by A*w and w*y (w=W^(1/2))
      *          matirix stored by column-major order (fortran convention)
      *-----------------------------------------------------------------------------*/
-    public static int lsq(final RealMatrix A, final RealVector y, int n, int m, RealVector x, RealMatrix Q)
+    int lsq(final Double[] A, final Double[] y, int n, int m, Double[] x,
+                   Double[] Q)
     {
-        RealMatrix Ay;
+        Double[] Ay;
         int info;
 
-        if (m<n) return -1;
+        if (m<n)
+            return -1;
         Ay=mat(n,1);
         matmul("NN",n,1,m,1.0,A,y,0.0,Ay); /* Ay=A*y */
         matmul("NT",n,n,m,1.0,A,A,0.0,Q);  /* Q=A*A' */
-        if (!(info=matinv(Q,n))) matmul("NN",n,1,n,1.0,Q,Ay,0.0,x); /* x=Q^-1*Ay */
+
+        if ((info=matinv(Q,n)) == 0)
+            matmul("NN",n,1,n,1.0,Q,Ay,0.0,x); /* x=Q^-1*Ay */
 
         return info;
     }
+
     /* kalman filter ---------------------------------------------------------------
      * kalman filter state update as follows:
      *
@@ -1044,31 +1103,33 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * notes  : matirix stored by column-major order (fortran convention)
      *          if state x[i]==0.0, not updates state x[i]/P[i+i*n]
      *-----------------------------------------------------------------------------*/
-    static int filter_(final double *x, final double *P, final double *H,
-                   final double *v, final double *R, int n, int m,
-                       double *xp, double *Pp)
+    public static int filter_(final Double[] x, final Double[] P, final Double[] H,
+                   final Double[] v, final Double[] R, int n, int m,
+                       Double[] xp, Double[] Pp)
     {
-        double *F=mat(n,m),*Q=mat(m,m),*K=mat(n,m),*I=eye(n);
+        Double[] F=mat(n,m),Q=mat(m,m),K=mat(n,m),I=eye(n);
         int info;
 
         matcpy(Q,R,m,m);
         matcpy(xp,x,n,1);
         matmul("NN",n,m,n,1.0,P,H,0.0,F);       /* Q=H'*P*H+R */
         matmul("TN",m,m,n,1.0,H,F,1.0,Q);
-        if (!(info=matinv(Q,m))) {
+        if ((info=matinv(Q,m)) == 0) {
             matmul("NN",n,m,m,1.0,F,Q,0.0,K);   /* K=P*H*Q^-1 */
             matmul("NN",n,1,m,1.0,K,v,1.0,xp);  /* xp=x+K*v */
             matmul("NT",n,n,m,-1.0,K,H,1.0,I);  /* Pp=(I-K*H')*P */
             matmul("NN",n,n,n,1.0,I,P,0.0,Pp);
         }
-        free(F); free(Q); free(K); free(I);
+
         return info;
     }
-    public static int filter(double *x, double *P, final double *H, final double *v,
-                  final double *R, int n, int m)
+
+    public static int filter(Double[] x, Double[] P, final Double[] H, final Double[] v,
+                  final Double[] R, int n, int m)
     {
-        double *x_,*xp_,*P_,*Pp_,*H_;
-        int i,j,k,info,*ix;
+        Double[] x_,xp_,P_,Pp_,H_;
+        int i,j,k,info;
+        Integer[] ix;
 
         ix=imat(n,1); for (i=k=0;i<n;i++) if (x[i]!=0.0&&P[i+i*n]>0.0) ix[k++]=i;
         x_=mat(k,1); xp_=mat(k,1); P_=mat(k,k); Pp_=mat(k,k); H_=mat(k,m);
@@ -1082,9 +1143,10 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             x[ix[i]]=xp_[i];
             for (j=0;j<k;j++) P[ix[i]+ix[j]*n]=Pp_[i+j*k];
         }
-        free(ix); free(x_); free(xp_); free(P_); free(Pp_); free(H_);
+
         return info;
     }
+
     /* smoother --------------------------------------------------------------------
      * combine forward and backward filters by fixed-interval smoother as follows:
      *
@@ -1101,25 +1163,26 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * notes  : see reference [4] 5.2
      *          matirix stored by column-major order (fortran convention)
      *-----------------------------------------------------------------------------*/
-    public static int smoother(final double[] xf, final double[] Qf, final double *xb,
-                    final double *Qb, int n, double *xs, double *Qs)
+    public static int smoother(final Double[] xf, final Double[] Qf, final Double[] xb,
+                    final Double[] Qb, int n, Double[] xs, Double[] Qs)
     {
-        double *invQf=mat(n,n),*invQb=mat(n,n),*xx=mat(n,1);
+        Double[] invQf=mat(n,n),invQb=mat(n,n),xx=mat(n,1);
         int i,info=-1;
 
         matcpy(invQf,Qf,n,n);
         matcpy(invQb,Qb,n,n);
-        if (!matinv(invQf,n)&&!matinv(invQb,n)) {
+        if ((matinv(invQf,n)!= 0) && (matinv(invQb,n)!=0) {
             for (i=0;i<n*n;i++) Qs[i]=invQf[i]+invQb[i];
-            if (!(info=matinv(Qs,n))) {
+            if ((info=matinv(Qs,n)) == 0) {
                 matmul("NN",n,1,n,1.0,invQf,xf,0.0,xx);
                 matmul("NN",n,1,n,1.0,invQb,xb,1.0,xx);
                 matmul("NN",n,1,n,1.0,Qs,xx,0.0,xs);
             }
         }
-        free(invQf); free(invQb); free(xx);
+
         return info;
     }
+
     /* print matrix ----------------------------------------------------------------
      * print matrix to stdout
      * args   : double *A        I   matrix A (n x m)
@@ -1129,7 +1192,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * return : none
      * notes  : matirix stored by column-major order (fortran convention)
      *-----------------------------------------------------------------------------*/
-    public static void matfprint(final RealMatrix A, int n, int m, int p, int q, File fp)
+    public static void matfprint(final Double[] A, int n, int m, int p, int q, File fp)
     {
         int i,j;
         String matrixEntry = new String();
@@ -1137,13 +1200,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         for (i=0;i<n;i++) {
             for (j=0;j<m;j++) {
-                fileWriter.write(String.format(matrixEntry," %*.*f",p,q,A.getEntry(i, j)));
+                fileWriter.write(String.format(matrixEntry," %*.*f",p,q,A[i+j*n]));
             }
             fileWriter.write("\n");
         }
         fileWriter.close();
     }
-    public static void matprint(final RealMatrix A, int n, int m, int p, int q)
+
+    public static void matprint(final Double[] A, int n, int m, int p, int q)
     {
         matfprint(A,n,m,p,q,System.out);
     }
@@ -1269,7 +1333,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     /* time to gps time ------------------------------------------------------------
      * convert gtime_t struct to week and tow in gps time
      * args   : gtime_t t        I   gtime_t struct
-     *          int    *week     IO  week number in gps time (NULL: no output)
+     *          int    *week     IO  week number in gps time (null: no output)
      * return : time of week in gps time (s)
      *-----------------------------------------------------------------------------*/
     public static double time2gpst(rtklib.gtime_t t, Integer week)
@@ -1303,7 +1367,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     /* time to galileo system time -------------------------------------------------
      * convert gtime_t struct to week and tow in galileo system time (gst)
      * args   : gtime_t t        I   gtime_t struct
-     *          int    *week     IO  week number in gst (NULL: no output)
+     *          int    *week     IO  week number in gst (null: no output)
      * return : time of week in gst (s)
      *-----------------------------------------------------------------------------*/
     public static double time2gst(rtklib.gtime_t t, Integer week)
@@ -1335,7 +1399,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     /* time to beidouo time (bdt) --------------------------------------------------
      * convert gtime_t struct to week and tow in beidou time (bdt)
      * args   : gtime_t t        I   gtime_t struct
-     *          int    *week     IO  week number in bdt (NULL: no output)
+     *          int    *week     IO  week number in bdt (null: no output)
      * return : time of week in bdt (s)
      *-----------------------------------------------------------------------------*/
     public static double time2bdt(rtklib.gtime_t t, Integer week)
@@ -1383,28 +1447,20 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     {
         rtklib.gtime_t time;
         double ep[6]={0};
-#ifdef WIN32
-        SYSTEMTIME ts;
 
-        GetSystemTime(&ts); /* utc */
-        ep[0]=ts.wYear; ep[1]=ts.wMonth;  ep[2]=ts.wDay;
-        ep[3]=ts.wHour; ep[4]=ts.wMinute; ep[5]=ts.wSecond+ts.wMilliseconds*1E-3;
-#else
         struct timeval tv;
         struct tm *tt;
 
-        if (!gettimeofday(&tv,NULL)&&(tt=gmtime(&tv.tv_sec))) {
-        ep[0]=tt.tm_year+1900; ep[1]=tt.tm_mon+1; ep[2]=tt.tm_mday;
-        ep[3]=tt.tm_hour; ep[4]=tt.tm_min; ep[5]=tt.tm_sec+tv.tv_usec*1E-6;
-    }
-#endif
+        if (!gettimeofday(&tv,null)&&(tt=gmtime(&tv.tv_sec))) {
+            ep[0]=tt.tm_year+1900; ep[1]=tt.tm_mon+1; ep[2]=tt.tm_mday;
+            ep[3]=tt.tm_hour; ep[4]=tt.tm_min; ep[5]=tt.tm_sec+tv.tv_usec*1E-6;
+        }
+
             time=epoch2time(ep);
 
-#ifdef CPUTIME_IN_GPST /* cputime operated in gpst */
-        time=gpst2utc(time);
-#endif
         return timeadd(time,timeoffset_);
     }
+
     /* set current time in utc -----------------------------------------------------
      * set current time in utc
      * args   : gtime_t          I   current time in utc
@@ -1417,6 +1473,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     {
         timeoffset_+=timediff(t,timeget());
     }
+
     /* read leap seconds table by text -------------------------------------------*/
     static int read_leaps_text(File fp)
     {
@@ -1832,23 +1889,25 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     } while (0)
 
     /* astronomical arguments: f={l,l',F,D,OMG} (rad) ----------------------------*/
-    static void ast_args(double t, double *f)
+    static void ast_args(double t, Double[] f)
     {
-        static final double fc[][5]={ /* coefficients for iau 1980 nutation */
-        { 134.96340251, 1717915923.2178,  31.8792,  0.051635, -0.00024470},
-        { 357.52910918,  129596581.0481,  -0.5532,  0.000136, -0.00001149},
-        {  93.27209062, 1739527262.8478, -12.7512, -0.001037,  0.00000417},
-        { 297.85019547, 1602961601.2090,  -6.3706,  0.006593, -0.00003169},
-        { 125.04455501,   -6962890.2665,   7.4722,  0.007702, -0.00005939}
-    };
-        double tt[4];
+        final double[][] fc=new double[][]{ /* coefficients for iau 1980 nutation */
+            { 134.96340251, 1717915923.2178,  31.8792,  0.051635, -0.00024470},
+            { 357.52910918,  129596581.0481,  -0.5532,  0.000136, -0.00001149},
+            {  93.27209062, 1739527262.8478, -12.7512, -0.001037,  0.00000417},
+            { 297.85019547, 1602961601.2090,  -6.3706,  0.006593, -0.00003169},
+            { 125.04455501,   -6962890.2665,   7.4722,  0.007702, -0.00005939}
+        };
+
+        double[] tt = new double[4];
         int i,j;
 
         for (tt[0]=t,i=1;i<4;i++) tt[i]=tt[i-1]*t;
         for (i=0;i<5;i++) {
             f[i]=fc[i][0]*3600.0;
-            for (j=0;j<4;j++) f[i]+=fc[i][j+1]*tt[j];
-            f[i]=fmod(f[i]*AS2R,2.0*PI);
+            for (j=0;j<4;j++)
+                f[i]+=fc[i][j+1]*tt[j];
+            f[i]=fmod(f[i]*rtklib.AS2R,2.0*rtklib.PI);
         }
     }
 
@@ -1967,17 +2026,18 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         double ang;
         int i,j;
 
-        dpsi=deps=0.0;
+        dpsi[0]=deps[0]=0.0;
 
         for (i=0;i<106;i++) {
             ang=0.0;
-            for (j=0;j<5;j++) ang+=nut[i][j]*f[j];
-                *dpsi+=(nut[i][6]+nut[i][7]*t)*Math.sin(ang);
-                *deps+=(nut[i][8]+nut[i][9]*t)*Math.cos(ang);
+            for (j=0;j<5;j++)
+                ang+=nut[i][j]*f[j];
+            dpsi[i]+=(nut[i][6]+nut[i][7]*t)*Math.sin(ang);
+            deps[i]+=(nut[i][8]+nut[i][9]*t)*Math.cos(ang);
         }
 
-        *dpsi*=1E-4*rtklib.AS2R; /* 0.1 mas . rad */
-        *deps*=1E-4*rtklib.AS2R;
+        dpsi[106]*=1E-4*rtklib.AS2R; /* 0.1 mas . rad */
+        deps[106]*=1E-4*rtklib.AS2R;
     }
 
     /* eci to ecef transformation matrix -------------------------------------------
@@ -1986,7 +2046,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          double *erpv     I   erp values {xp,yp,ut1_utc,lod} (rad,rad,s,s/d)
      *          double *U        O   eci to ecef transformation matrix (3 x 3)
      *          double *gmst     IO  greenwich mean sidereal time (rad)
-     *                               (NULL: no output)
+     *                               (null: no output)
      * return : none
      * note   : see ref [3] chap 5
      *          not thread-safe
@@ -1994,19 +2054,29 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static void eci2ecef(rtklib.gtime_t tutc, final double[] erpv, Double U, Double gmst)
     {
         final double ep2000[]={2000,1,1,12,0,0};
-        static rtklib.gtime_t tutc_;
-        static double U_[9];
-        static double gmst_;
+        rtklib.gtime_t tutc_;
+        double[] U_ = new double[9];
+        double gmst_;
         rtklib.gtime_t tgps;
-        double eps,ze,th,z,t,t2,t3,dpsi,deps,gast,f[5];
-        double R1[9],R2[9],R3[9],R[9],W[9],N[9],P[9],NP[9];
+        double eps,ze,th,z,t,t2,t3,dpsi,deps,gast;
+        double[] f = new double[5];
+        double[] R1 = new double[9];
+        double[] R2 = new double[9];
+        double[] R3 = new double[9];
+        double[] R = new double[9];
+        double[] W = new double[9];
+        double[] N = new double[9];
+        double[] P = new double[9];
+        double[] NP = new double[9];
         int i;
 
         trace(4,"eci2ecef: tutc=%s\n",time_str(tutc,3));
 
         if (Math.abs(timediff(tutc,tutc_))<0.01) { /* read cache */
-            for (i=0;i<9;i++) U[i]=U_[i];
-            if (gmst) *gmst=gmst_;
+            for (i=0;i<9;i++)
+                U[i]=U_[i];
+            if (gmst)
+                *gmst=gmst_;
             return;
         }
         tutc_=tutc;
@@ -2036,8 +2106,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         /* greenwich aparent sidereal time (rad) */
         gmst_=utc2gmst(tutc_,erpv[2]);
-        gast=gmst_+dpsi*cos(eps);
-        gast+=(0.00264*sin(f[4])+0.000063*sin(2.0*f[4]))*AS2R;
+        gast=gmst_+dpsi*Math.cos(eps);
+        gast+=(0.00264*Math.sin(f[4])+0.000063*Math.sin(2.0*f[4]))*AS2R;
 
         /* eci to ecef transformation matrix */
         Ry(-erpv[0],R1); Rx(-erpv[1],R2); Rz(gast,R3);
@@ -2055,13 +2125,14 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         trace(5,"W=\n"); tracemat(5,W,3,3,15,12);
         trace(5,"U=\n"); tracemat(5,U,3,3,15,12);
     }
+
     /* decode antenna parameter field --------------------------------------------*/
     static int decodef(char *p, int n, double *v)
     {
         int i;
 
         for (i=0;i<n;i++) v[i]=0.0;
-        for (i=0,p=strtok(p," ");p&&i<n;p=strtok(NULL," ")) {
+        for (i=0,p=strtok(p," ");p&&i<n;p=strtok(null," ")) {
             v[i++]=atof(p)*1E-3;
         }
         return i;
@@ -2238,7 +2309,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *          char   *type       I   antenna type for receiver antenna
      *          gtime_t time       I   time to search parameters
      *          pcvs_t *pcvs       IO  antenna parameters
-     * return : antenna parameter (NULL: no antenna)
+     * return : antenna parameter (null: no antenna)
      *-----------------------------------------------------------------------------*/
     public static rtklib.pcv_t searchpcv(int sat, final String type, rtklib.gtime_t time,
                         final rtklib.pcvs_t pcvs)
@@ -2262,8 +2333,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         }
         else {
             strcpy(buff,type);
-            for (p=strtok(buff," ");p&&n<2;p=strtok(NULL," ")) types[n++]=p;
-            if (n<=0) return NULL;
+            for (p=strtok(buff," ");p&&n<2;p=strtok(null," ")) types[n++]=p;
+            if (n<=0) return null;
 
             /* search receiver antenna with radome at first */
             for (i=0;i<pcvs.n;i++) {
@@ -2402,7 +2473,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
                 erp.nmax=erp.nmax<=0?128:erp.nmax*2;
                 erp_data=(erpd_t *)realloc(erp.data,sizeof(erpd_t)*erp.nmax);
                 if (!erp_data) {
-                    free(erp.data); erp.data=NULL; erp.n=erp.nmax=0;
+                    free(erp.data); erp.data=null; erp.n=erp.nmax=0;
                     fclose(fp);
                     return 0;
                 }
@@ -2504,7 +2575,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         if (!(nav_eph=(rtklib.eph_t *)realloc(nav.eph,sizeof(eph_t)*nav.n))) {
         trace(1,"uniqeph malloc error n=%d\n",nav.n);
-        free(nav.eph); nav.eph=NULL; nav.n=nav.nmax=0;
+        free(nav.eph); nav.eph=null; nav.n=nav.nmax=0;
         return;
     }
         nav.eph=nav_eph;
@@ -2546,7 +2617,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         if (!(nav_geph=(geph_t *)realloc(nav.geph,sizeof(geph_t)*nav.ng))) {
         trace(1,"uniqgeph malloc error ng=%d\n",nav.ng);
-        free(nav.geph); nav.geph=NULL; nav.ng=nav.ngmax=0;
+        free(nav.geph); nav.geph=null; nav.ng=nav.ngmax=0;
         return;
     }
         nav.geph=nav_geph;
@@ -2586,7 +2657,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         if (!(nav_seph=(seph_t *)realloc(nav.seph,sizeof(seph_t)*nav.ns))) {
         trace(1,"uniqseph malloc error ns=%d\n",nav.ns);
-        free(nav.seph); nav.seph=NULL; nav.ns=nav.nsmax=0;
+        free(nav.seph); nav.seph=null; nav.ns=nav.nsmax=0;
         return;
     }
         nav.seph=nav_seph;
@@ -2803,7 +2874,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void freeobs(obs_t *obs)
     {
-        free(obs.data); obs.data=NULL; obs.n=obs.nmax=0;
+        free(obs.data); obs.data=null; obs.n=obs.nmax=0;
     }
     /* free navigation data ---------------------------------------------------------
      * free memory for navigation data
@@ -2817,19 +2888,19 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      *-----------------------------------------------------------------------------*/
     public static void freenav(nav_t *nav, int opt)
     {
-        if (opt&0x01) {free(nav.eph ); nav.eph =NULL; nav.n =nav.nmax =0;}
-        if (opt&0x02) {free(nav.geph); nav.geph=NULL; nav.ng=nav.ngmax=0;}
-        if (opt&0x04) {free(nav.seph); nav.seph=NULL; nav.ns=nav.nsmax=0;}
-        if (opt&0x08) {free(nav.peph); nav.peph=NULL; nav.ne=nav.nemax=0;}
-        if (opt&0x10) {free(nav.pclk); nav.pclk=NULL; nav.nc=nav.ncmax=0;}
-        if (opt&0x20) {free(nav.alm ); nav.alm =NULL; nav.na=nav.namax=0;}
-        if (opt&0x40) {free(nav.tec ); nav.tec =NULL; nav.nt=nav.ntmax=0;}
-        if (opt&0x80) {free(nav.fcb ); nav.fcb =NULL; nav.nf=nav.nfmax=0;}
+        if (opt&0x01) {free(nav.eph ); nav.eph =null; nav.n =nav.nmax =0;}
+        if (opt&0x02) {free(nav.geph); nav.geph=null; nav.ng=nav.ngmax=0;}
+        if (opt&0x04) {free(nav.seph); nav.seph=null; nav.ns=nav.nsmax=0;}
+        if (opt&0x08) {free(nav.peph); nav.peph=null; nav.ne=nav.nemax=0;}
+        if (opt&0x10) {free(nav.pclk); nav.pclk=null; nav.nc=nav.ncmax=0;}
+        if (opt&0x20) {free(nav.alm ); nav.alm =null; nav.na=nav.namax=0;}
+        if (opt&0x40) {free(nav.tec ); nav.tec =null; nav.nt=nav.ntmax=0;}
+        if (opt&0x80) {free(nav.fcb ); nav.fcb =null; nav.nf=nav.nfmax=0;}
     }
     /* debug trace functions -----------------------------------------------------*/
 #ifdef TRACE
 
-    static File *fp_trace=NULL;     /* file pointer of trace */
+    static File *fp_trace=null;     /* file pointer of trace */
     static char file_trace[1024];   /* trace file */
     static int level_trace=0;       /* level of trace */
     static unsigned int tick_trace=0; /* tick time at traceopen (ms) */
@@ -2843,8 +2914,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         lock(&lock_trace);
 
-        if ((int)(time2gpst(time      ,NULL)/INT_SWAP_TRAC)==
-                (int)(time2gpst(time_trace,NULL)/INT_SWAP_TRAC)) {
+        if ((int)(time2gpst(time      ,null)/INT_SWAP_TRAC)==
+                (int)(time2gpst(time_trace,null)/INT_SWAP_TRAC)) {
             unlock(&lock_trace);
             return;
         }
@@ -2876,7 +2947,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     public static void traceclose(void)
     {
         if (fp_trace&&fp_trace!=stderr) fclose(fp_trace);
-        fp_trace=NULL;
+        fp_trace=null;
         file_trace[0]='\0';
     }
     public static void tracelevel(int level)
@@ -3054,8 +3125,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
 
         si.cb=sizeof(si);
         sprintf(cmds,"cmd /c %s",cmd);
-        if (!CreateProcess(NULL,(LPTSTR)cmds,NULL,NULL,FALSE,CREATE_NO_WINDOW,NULL,
-                NULL,&si,&info)) return -1;
+        if (!CreateProcess(null,(LPTSTR)cmds,null,null,FALSE,CREATE_NO_WINDOW,null,
+                null,&si,&info)) return -1;
         WaitForSingleObject(info.hProcess,INFINITE);
         if (!GetExitCodeProcess(info.hProcess,&stat)) stat=-1;
         CloseHandle(info.hProcess);
@@ -3118,7 +3189,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
             for (p=s1;*p;p++) *p=(char)tolower((int)*p);
             for (p=s2;*p;p++) *p=(char)tolower((int)*p);
 
-            for (p=s1,q=strtok_r(s2,"*",&r);q;q=strtok_r(NULL,"*",&r)) {
+            for (p=s1,q=strtok_r(s2,"*",&r);q;q=strtok_r(null,"*",&r)) {
                 if ((p=strstr(p,q))) p+=strlen(q); else break;
             }
             if (p&&n<nmax) sprintf(paths[n++],"%s%s",dir,d.d_name);
@@ -3156,7 +3227,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
     *p='\0';
 
 #ifdef WIN32
-        CreateDirectory(buff,NULL);
+        CreateDirectory(buff,null);
 #else
         mkdir(buff,0777);
 #endif
@@ -3350,7 +3421,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * compute satellite azimuth/elevation angle
      * args   : double *pos      I   geodetic position {lat,lon,h} (rad,m)
      *          double *e        I   receiver-to-satellilte unit vevtor (ecef)
-     *          double *azel     IO  azimuth/elevation {az,el} (rad) (NULL: no output)
+     *          double *azel     IO  azimuth/elevation {az,el} (rad) (null: no output)
      *                               (0.0<=azel[0]<2*pi,-pi/2<=azel[1]<=pi/2)
      * return : elevation angle (rad)
      *-----------------------------------------------------------------------------*/
@@ -3587,7 +3658,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * args   : gtime_t t        I   time
      *          double *pos      I   receiver position {lat,lon,h} (rad,m)
      *          double *azel     I   azimuth/elevation angle {az,el} (rad)
-     *          double *mapfw    IO  wet mapping function (NULL: not output)
+     *          double *mapfw    IO  wet mapping function (null: not output)
      * return : dry mapping function
      * note   : see ref [5] (NMF) and [9] (GMF)
      *          original JGR paper of [5] has bugs in eq.(4) and (5). the corrected
@@ -3728,8 +3799,8 @@ final String[] formatstrs = new String[]{    /* stream format strings */
      * get sun and moon position in ecef
      * args   : gtime_t tut      I   time in ut1
      *          double *erpv     I   erp value {xp,yp,ut1_utc,lod} (rad,rad,s,s/d)
-     *          double *rsun     IO  sun position in ecef  (m) (NULL: not output)
-     *          double *rmoon    IO  moon position in ecef (m) (NULL: not output)
+     *          double *rsun     IO  sun position in ecef  (m) (null: not output)
+     *          double *rmoon    IO  moon position in ecef (m) (null: not output)
      *          double *gmst     O   gmst (rad)
      * return : none
      *-----------------------------------------------------------------------------*/
@@ -3744,7 +3815,7 @@ final String[] formatstrs = new String[]{    /* stream format strings */
         tut=timeadd(tutc,erpv[2]); /* utc . ut1 */
 
         /* sun and moon position in eci */
-        sunmoonpos_eci(tut,rsun?rs:NULL,rmoon?rm:NULL);
+        sunmoonpos_eci(tut,rsun?rs:null,rmoon?rm:null);
 
         /* eci to ecef transformation matrix */
         eci2ecef(tutc,erpv,U,&gmst_);
